@@ -1,0 +1,76 @@
+Usuarios
+
+	Boss		pode assignar team leaders
+	Team Leader	pode escolher e delegar tarefas a User
+	Team boys	pode escolher tarefas
+	Teamless	pode entrar pra um time? Precisa ser selecionado?
+
+Equipes
+	Interface de criação de time - Quem pode criar?
+	Dashboard tem q mostrar
+		projetos ativos
+		distribuição de tarefas
+		prazos proximos
+	Metricas de performance?
+
+problemas
+	uma tarefa por team boy?
+	time sem lider? alguem pode se voluntariar?
+
+
+acesso
+	Usuario se cadastra mas como verificar se é um funcionario?
+	verificar email?
+	Acesso por cargo?
+	Mudança de senha?
+
+segurança
+	como prevenir spam de tarefas?
+	como prevenir excesso de tentativas de acesso
+	pedir aprovação para edição/deletar projetos?
+
+duvidas
+
+	o que é um models.ManyToManyField ?
+
+Tarefas
+	pesquisar kanban
+	filtrar tarefas (por projeto/por usuario/por status)
+	Notificações quando estiver perto do prazo
+
+Dashboard pessoal
+	Visualização geral da tarefa
+	feed do time?
+	visualização da timeline do projeto?
+	drag and drop de tarefas?
+	notificações por email para
+		assigmento de tarefa
+		lembretes de prazos
+		mudanças de status
+
+Logs
+	Como fazer?
+	precisa ser filtravel
+	quem pode ver?
+
+
+TODO
+	Sistema de autenticação
+	    invite_user views.py
+	    signup.html
+	    contatoadmin.html
+	    cobrir com testes
+
+	Implementar CRUD para tarefas básico
+
+	Management de equipe
+
+	Fazer o log
+
+	Fazer o dashboard
+
+	Fazer notificações
+	
+	Reports e analytics
+
+	Testes

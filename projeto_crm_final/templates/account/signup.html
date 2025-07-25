@@ -1,0 +1,113 @@
+{% extends 'projeto_crm_final/base.html' %}
+{% load widget_tweaks %}
+{% block title %}Registro{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2>Registrar Novo Usuário</h2>
+
+  <form method="post" action="{% url 'account_signup' %}" class="needs-validation" novalidate>
+    {% csrf_token %}
+
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        {% for field, errors in form.errors.items %}
+          {% for error in errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- username  -->
+    <div class="mb-3">
+      <label for="id_username" class="form-label">Nome de usuário*</label>
+      {{ form.username|add_class:"form-control"|attr:"required" }}
+      <div class="invalid-feedback">
+        Nome de usuário indisponível.
+      </div>
+    </div>
+
+    <!-- First/Last Name  -->
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="id_first_name" class="form-label">Nome*</label>
+        {{ form.first_name|add_class:"form-control"|attr:"required" }}
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="id_last_name" class="form-label">Sobrenome*</label>
+        {{ form.last_name|add_class:"form-control"|attr:"required" }}
+      </div>
+    </div>
+
+    <!-- Email  -->
+    <div class="mb-3">
+      <label for="id_email" class="form-label">E-mail*</label>
+      {{ form.email|add_class:"form-control"|attr:"required" }}
+      <div class="invalid-feedback">
+        Por favor insira um e-mail válido.
+      </div>
+    </div>
+
+    <!-- Telefone contato -->
+    <div class="mb-3">
+      <label for="id_telefone" class="form-label">Telefone*</label>
+      {{ form.telefone|add_class:"form-control" }}
+    </div>
+
+    <!-- Password  -->
+    <div class="mb-3">
+      <label for="id_password1" class="form-label">Senha*</label>
+      {{ form.password1|add_class:"form-control"|attr:"required" }}
+      <div class="invalid-feedback">Mínimo 8 caracteres, não pode ser comum.</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="id_password2" class="form-label">Confirme sua Senha*</label>
+      {{ form.password2|add_class:"form-control"|attr:"required" }}
+      <div class="invalid-feedback">As senhas precisam ser idênticas.</div>
+    </div>
+
+    <!-- Submit -->
+    <button type="submit" class="btn btn-primary">Registrar</button>
+    <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
+
+    <!-- Login  -->
+    <div class="mt-3">
+      Já tem uma conta? <a href="{% url 'account_login' %}">Faça login</a>
+    </div>
+  </form>
+</div>
+
+<!-- Bootstrap validation script -->
+<script>
+(() => {
+  'use strict'
+  const forms = document.querySelectorAll('.needs-validation')
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>
+
+<style>
+/* Custom styling */
+.invalid-feedback {
+  display: none;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: #dc3545;
+}
+
+.was-validated .form-control:invalid ~ .invalid-feedback {
+  display: block;
+}
+</style>
+{% endblock %}

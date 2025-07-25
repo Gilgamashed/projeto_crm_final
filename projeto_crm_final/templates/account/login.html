@@ -1,0 +1,53 @@
+{% extends 'projeto_crm_final/base.html' %}
+{% load widget_tweaks %}  <!-- pode ser colocado na pagina template base -->
+{% block title %}Login{% endblock %}
+
+
+{% block content %}
+
+<div class="container mt-5">
+  <h2>Login</h2>
+
+  <form method="post" action="{% url 'account_login' %}">
+    {% csrf_token %}
+    {% if form.errors %}
+      <div class="alert alert-danger">Erro: Verifique seu nome de usuário e senha.</div>
+    {% endif %}
+
+    <div class ="mb-3">
+      <label for="username" class="form-label"></label>
+      <input type="text" name="username" id="username" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label"></label>
+      <input type="password" name="password" id="password" class="form-control">
+    </div>
+
+    <div class="mb-3 form-check">
+      <input type="checkbox" class="form-check-input" id="id_remember" name="remember">
+      <label class="form-check-label" for="id_remember">Lembre-se de mim</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+      <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
+
+    <!-- Segurança -->
+    <div class="mt-3">
+      <a href="{% url 'account_reset_password' %}">Esqueceu sua senha?</a>
+
+        | <a href="{% url 'account_signup' %}">Registrar</a>
+
+    </div>
+
+    <div class="mt-3">
+      {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <div class="my-3 alert alert-danger">
+                {{ error }}
+            </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

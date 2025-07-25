@@ -1,0 +1,36 @@
+Sistema de Controle de Tarefas e Times (Mini CRM de produtividade)
+Data de conclusão 8 de agosto de 2025 às 23:59
+Mini CRM de produtividade
+
+Instruções
+🎯 Objetivo:
+Criar uma aplicação web para gestão de times e atribuição de tarefas, funcionando como um mini CRM para times de projetos.
+
+🧾 Descrição:
+O sistema permitirá criar times, registrar usuários e atribuir tarefas com datas e prioridades. Ideal para simular o ambiente de gerenciamento de projetos em equipe com foco em produtividade.
+
+✅ Funcionalidades Requeridas (MVP):
+CRUD de times com nome e descrição.
+CRUD de usuários com nome, e-mail e cargo.
+CRUD de tarefas, vinculadas a um time e a um usuário, com título, descrição, status, prazo e prioridade.
+Visualização das tarefas por usuário.
+Filtro de tarefas por status ou prioridade.
+Sistema de autenticação.
+Envio de e-mail de notificação ao atribuir uma tarefa.
+Deploy no Render.
+
+🚀 Funcionalidades Estendidas (Desafio):
+Visualização de tarefas por Kanban (To Do, Doing, Done).
+Dashboard com tarefas atrasadas e concluídas.
+Exportação de tarefas em CSV.
+Histórico de movimentação da tarefa (audit log).
+API RESTful documentada com Swagger.
+
+📊 Critérios de Avaliação:
+Modelagem eficaz das entidades Time–Usuário–Tarefa.
+Clareza nos fluxos de atribuição e acompanhamento.
+Uso do Django ORM e CBVs.
+Estrutura modular e reutilizável.
+Eficiência na filtragem e exibição de dados.
+Capacidade de escalar a lógica de negócios.
+Apresentação e navegabilidade do sistema.
