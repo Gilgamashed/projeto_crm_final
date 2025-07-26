@@ -11,6 +11,16 @@
         </div>
       {% endfor %}
     {% endif %}
+    {% if user.is_authenticated and is_admin %}
+
+            <p>É admin!</p>
+
+    {% else %}
+
+            <p>Não é admin!</p>
+
+    {% endif %}
+
 {% endblock %}
 
 

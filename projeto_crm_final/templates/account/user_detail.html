@@ -1,0 +1,18 @@
+{% extends 'projeto_crm_final/base.html' %}
+{% load widget_tweaks %}  <!-- pode ser colocado na pagina template base -->
+{% block title %}Perfil{% endblock %}
+
+
+{% block content %}
+
+
+
+      <h1>Detalhes do usuário {{perfil.user.first_name}} </h1>
+      <p><strong>Nome:</strong> "{{perfil.user.first_name}} {{perfil.user.last_name}}"</p>
+      <p><strong>Email:</strong> "{{perfil.user.email}}"</p>
+      <p><strong>Telefone:</strong> "{{perfil.telefone}}"</p>
+      <p><strong>Role:</strong> "{{perfil.role}}"</p>
+      <a href="{% url 'dashboard' %}">Voltar à sua home</a>
+
+
+{% endblock %}

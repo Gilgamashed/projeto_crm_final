@@ -6,71 +6,58 @@
 <div class="container mt-5">
   <h2>Registrar Novo Usuário</h2>
 
-  <form method="post" action="{% url 'account_signup' %}" class="needs-validation" novalidate>
+ <form method="post" class="needs-validation" novalidate>
     {% csrf_token %}
 
-    {% if form.errors %}
-      <div class="alert alert-danger">
-        {% for field, errors in form.errors.items %}
-          {% for error in errors %}
-            <p>{{ error }}</p>
-          {% endfor %}
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    <!-- username  -->
-    <div class="mb-3">
-      <label for="id_username" class="form-label">Nome de usuário*</label>
-      {{ form.username|add_class:"form-control"|attr:"required" }}
-      <div class="invalid-feedback">
-        Nome de usuário indisponível.
-      </div>
-    </div>
-
-    <!-- First/Last Name  -->
     <div class="row">
       <div class="col-md-6 mb-3">
-        <label for="id_first_name" class="form-label">Nome*</label>
-        {{ form.first_name|add_class:"form-control"|attr:"required" }}
+        <label class="form-label">{{ form.nome.label }}</label>
+        {{ form.nome|add_class:"form-control" }}
+        {% if form.nome.errors %}
+          <div class="invalid-feedback d-block">
+            {% for error in form.nome.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
       <div class="col-md-6 mb-3">
-        <label for="id_last_name" class="form-label">Sobrenome*</label>
-        {{ form.last_name|add_class:"form-control"|attr:"required" }}
+        <label class="form-label">{{ form.sobrenome.label }}</label>
+        {{ form.sobrenome|add_class:"form-control" }}
+        {% if form.sobrenome.errors %}
+          <div class="invalid-feedback d-block">
+            {% for error in form.sobrenome.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
     </div>
 
-    <!-- Email  -->
-    <div class="mb-3">
-      <label for="id_email" class="form-label">E-mail*</label>
-      {{ form.email|add_class:"form-control"|attr:"required" }}
-      <div class="invalid-feedback">
-        Por favor insira um e-mail válido.
-      </div>
-    </div>
+    {% for field in form %}
+      {% if field.name != 'nome' and field.name != 'sobrenome' %}
+      <div class="mb-3">
+        <label class="form-label">{{ field.label }}</label>
+            {{ field|add_class:"form-control" }}
+            {% if field.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in field.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+              {% if field.help_text %}
+                <small class="form-text text-danger">
+                  {{ field.help_text }}
+                </small>
+              {% endif %}
+            {% endif %}
+          </div>
+          {% endif %}
+        {% endfor %}
 
-    <!-- Telefone contato -->
-    <div class="mb-3">
-      <label for="id_telefone" class="form-label">Telefone*</label>
-      {{ form.telefone|add_class:"form-control" }}
-    </div>
 
-    <!-- Password  -->
-    <div class="mb-3">
-      <label for="id_password1" class="form-label">Senha*</label>
-      {{ form.password1|add_class:"form-control"|attr:"required" }}
-      <div class="invalid-feedback">Mínimo 8 caracteres, não pode ser comum.</div>
-    </div>
-
-    <div class="mb-3">
-      <label for="id_password2" class="form-label">Confirme sua Senha*</label>
-      {{ form.password2|add_class:"form-control"|attr:"required" }}
-      <div class="invalid-feedback">As senhas precisam ser idênticas.</div>
-    </div>
-
-    <!-- Submit -->
-    <button type="submit" class="btn btn-primary">Registrar</button>
-    <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
+  <button type="submit" class="btn btn-success">Cadastrar</button>
+  <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
 
     <!-- Login  -->
     <div class="mt-3">

@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -5,15 +7,15 @@ from projeto_crm_final.constants import HIERARCH
 
 
 class Integrantes(models.Model):
-    username = models.OneToOneField(User, unique=True, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    person_id = models.UUIDField(primary_key=True, default=uuid.uuid4(),editable=False)
+    user = models.OneToOneField(User, unique=True, on_delete=models.CASCADE, max_length=20)
+    nome = models.CharField(max_length=25)
+    sobrenome = models.CharField(max_length=100)
     telefone = models.CharField(max_length=20, blank=True)
-    email = models.EmailField('email', unique=True, db_index=True)
     role = models.CharField(max_length=20,choices=HIERARCH,default='MEMBER')
 
     def __str__(self):
-        return self.first_name
+        return self.user.first_name
 
 
 
