@@ -1,5 +1,6 @@
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
@@ -20,12 +21,6 @@ class SignUpView(CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        Integrantes.objects.create(
-            user=self.object,
-            nome=form.cleaned_data.get('nome'),
-            sobrenome=form.cleaned_data.get('sobrenome'),
-            telefone= form.cleaned_data.get('telefone'),
-        )
         login(self.request, self.object)
         return response
 
@@ -46,13 +41,10 @@ class DashboardView(TemplateView):
         return context
 
 
-class IntegrantesGetView(DetailView):
+class IntegrantesGetView(LoginRequiredMixin, DetailView):
     model = Integrantes
     template_name = "account/user_detail.html"
     context_object_name = "perfil"
-
-    def get_object(self):
-        user = get_object_or_404(User, username=self.kwargs['username'])
-        return get_object_or_404(Integrantes, username=user)
+    pk_url_kwarg = "person_id"
 
 # Create your views here.

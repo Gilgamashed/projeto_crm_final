@@ -29,7 +29,7 @@ urlpatterns = [
 
     path('account/login/', LoginView.as_view(template_name='account/login.html'), name='account_login'),
     path('account/logout/', require_POST(LogoutView.as_view(next_page='home')), name='account_logout'),
-    path("account/profile/<str:username>", IntegrantesGetView.as_view(), name='account_user_detail'),
+    path("account/profile/<uuid:person_id>/", IntegrantesGetView.as_view(), name='account_user_detail'),
     path('account/signup/', SignUpView.as_view(), name='account_signup'),
     path('account/password_reset/', PassResetView.as_view(), name='account_reset_password'),
 ]

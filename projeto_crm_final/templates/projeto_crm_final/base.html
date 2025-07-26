@@ -64,7 +64,7 @@
               <!-- navbar Perfil user -->
             {% if user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="{% url 'account_user_detail' username=perfil.username.username">Perfil</a>
+              <a class="nav-link active" aria-current="page" href="{% url 'account_user_detail' person_id=request.user.integrantes.person_id %} ">Perfil</a>
             </li>
             {% endif %}
 

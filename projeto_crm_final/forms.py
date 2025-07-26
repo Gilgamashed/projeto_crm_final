@@ -57,14 +57,25 @@ class SignupForm(UserCreationForm):
             'email': 'Por favor, insira um e-mail válido.'
         }
 
+    #def save(self, commit=True):
+    #    user = super().save(commit=False)
+    #    user.nome = self.cleaned_data['nome']
+    #    user.sobrenome = self.cleaned_data['sobrenome']
+    #    if commit:
+    #        user.save()
+    #    return user
+
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.nome = self.cleaned_data['nome']
-        user.sobrenome = self.cleaned_data['sobrenome']
-        if commit:
-            user.save()
+        user.save()  # Save user first
 
-
+        # Create Integrantes with synced names
+        Integrantes.objects.create(
+            user=user,
+            nome=self.cleaned_data['nome'],
+            sobrenome=self.cleaned_data['sobrenome'],
+            telefone=self.cleaned_data.get('telefone')
+        )
         return user
 
     def clean_email(self):

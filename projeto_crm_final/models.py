@@ -14,8 +14,14 @@ class Integrantes(models.Model):
     telefone = models.CharField(max_length=20, blank=True)
     role = models.CharField(max_length=20,choices=HIERARCH,default='MEMBER')
 
+    def save(self, *args, **kwargs):
+        self.user.first_name = self.nome
+        self.user.last_name = self.sobrenome
+        self.user.save()
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return self.user.first_name
+        return self.user.nome
 
 
 
