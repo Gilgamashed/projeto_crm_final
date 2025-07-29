@@ -40,7 +40,7 @@ class Projetos(models.Model):
     criador = models.ForeignKey(Integrantes, on_delete=models.CASCADE)
     equipe = models.ForeignKey(Equipes, on_delete=models.SET_NULL, null=True)
     categoria = models.CharField(max_length=100, choices=CATEGORIA, default='null')
-    inicio = models.DateField(auto_now_add=True)
+    inicio = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUSPROJETO, default='active')
     prazofinal = models.DateField()
 

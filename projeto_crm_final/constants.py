@@ -25,7 +25,7 @@ CATEGORIA = [
 STATUSPROJETO = [
     ('active', 'Ativo'),
     ('canceled', 'Cancelado'),
-    ('expired', 'Data vencida'),
+    ('overdue', 'Data vencida'),
     ('done','Concluído')
 ]
 

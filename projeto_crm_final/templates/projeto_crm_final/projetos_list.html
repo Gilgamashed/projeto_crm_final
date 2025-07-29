@@ -3,48 +3,150 @@
 {% block title %}Projetos{% endblock %}
 
 {% block content %}
+<main class="main-scroll">
+  <div class="container-fluid">
+    <!-- header e botao de criar-->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>Lista de Projetos</h1>
+      <a href="{% url 'projetos_create' %}" class="btn btn-success">
+        <i class="bi bi-plus-lg"></i> Novo Projeto
+      </a>
+    </div>
 
-  <main class="main-scroll">
-    <div class="container-fluid">
-            <!-- header com botão para criar -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Lista de Projetos</h1>
-        <a href="{% url 'projetos_create' %}" class="btn btn-success">
-          <i class="bi bi-plus-lg"></i> Criar projeto
-        </a>
-      </div>
-      <div class="row g-3">
-        {% for projeto in projetos %}
-          <div class="col-12">
-            <div class="card projeto-card shadow-sm">
-              <div class="card-body">
+    <!-- filtros -->
+    <ul class="nav nav-tabs mb-4">
+      <li class="nav-item">
+        <a class="nav-link {% if not request.GET.status %}active{% endif %}"
+           href="?">Todos</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if request.GET.status == 'active' %}active{% endif %}"
+           href="?status=active">Ativos</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if request.GET.status == 'canceled' %}active{% endif %}"
+           href="?status=overdue">Cancelado</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if request.GET.status == 'overdue' %}active{% endif %}"
+           href="?status=overdue">Atrasados</a>
+      </li>
+            <li class="nav-item">
+        <a class="nav-link {% if request.GET.status == 'done' %}active{% endif %}"
+           href="?status=overdue">Concluídos</a>
+      </li>
+    </ul>
+
+    <div class="row g-3">
+      {% for projeto in projetos %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card projeto-card shadow-sm h-100">
+            <div class="card-body d-flex flex-column">
+              <div class="d-flex justify-content-between align-items-start">
                 <h5 class="card-title mb-2">{{ projeto.name|capfirst }}</h5>
-                <h6 class="card-title mb-2">{{ projeto.categoria }} <span class="text-muted">({{ projeto.status }})</span></h6>
-                <p class="card-text mb-2"><i class="bi bi-geo-alt-fill"></i> Equipe ativa: {{ projeto.equipe }}</p>
-                <!-- botoes -->
-                <div class="mt-3">
-                  <a href="{% url 'projetos_detail' projeto.id %}" class="btn btn-sm btn-outline-primary">
+                <span class="badge bg-light text-dark">{{ projeto.categoria }}</span>
+              </div>
+
+              <h6 class="card-subtitle mb-2">
+                <span class="status-{{ projeto.status|lower }}">
+                  {{ projeto.get_status_display }}
+                </span>
+              </h6>
+
+              <p class="card-text mb-2">
+                <i class="bi bi-people-fill"></i>
+                Equipe: {{ projeto.equipe|default:"Aguardando" }}
+              </p>
+
+              <p class="card-text mb-2">
+                <i class="bi bi-calendar"></i>
+                Prazo: {{ projeto.prazofinal|date:"d/m/Y" }}
+              </p>
+
+              <div class="mt-auto pt-2">
+                <div class="d-flex justify-content-between">
+                  <a href="{% url 'projetos_detail' projeto.id %}"
+                     class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-info-circle"></i> Detalhes
                   </a>
+
+                  <span class="text-muted small">
+                    <i class="bi bi-clock"></i>
+                    {{ projeto.inicio|timesince }}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-        {% empty %}
-          <p class="text-muted text-center">Nenhum projeto ativo.</p>
-        {% endfor %}
-      </div>
+        </div>
+      {% empty %}
+        <div class="col-12">
+          <div class="alert alert-info text-center">
+            <i class="bi bi-inbox"></i> Nenhum projeto encontrado
+          </div>
+          <div class="text-center">
+            <a href="{% url 'projetos_create' %}" class="btn btn-primary">
+              Criar Primeiro Projeto
+            </a>
+          </div>
+        </div>
+      {% endfor %}
     </div>
-  </main>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+          </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <li class="page-item active">
+              <a class="page-link" href="#">{{ num }}</a>
+            </li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</main>
 
 <style>
-/* cores pro status */
+/* Status colors */
 .status-active { color: #28a745; }
 .status-overdue { color: #dc3545; font-weight: bold; }
 .status-canceled { color: #6c757d; }
 .status-done { color: #007bff; }
 .status-pending { color: #ffc107; }
 
+/* Card enhancements */
+.projeto-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: none;
+  border-radius: 8px;
+}
+.projeto-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.card-title {
+  font-weight: 600;
+}
+</style>
+
 {% endblock %}
-
-

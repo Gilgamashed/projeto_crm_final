@@ -76,6 +76,13 @@ class ProjetosView(ListView):
     model= Projetos
     template_name='projeto_crm_final/projetos_list.html'
     context_object_name= 'projetos'
+    paginate_by = 12
+
+    def get_queryset(self):
+        status = self.request.GET.get('status')
+        if status:
+            return Projetos.objects.filter(status=status)
+        return Projetos.objects.all()
 
 class ProjetosCreateView(LoginRequiredMixin, LeadRequiredMixin, CreateView):
     model = Projetos
