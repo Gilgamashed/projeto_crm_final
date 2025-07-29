@@ -1,0 +1,115 @@
+{% extends 'projeto_crm_final/base.html' %}
+{% load widget_tweaks %}
+{% block title %}Gerenciar Projeto{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2>{% if object %}Editar Projeto {{ projeto.name }} {% else %}Criar Novo Projeto{% endif %}</h2>
+
+  <form method="post" class="needs-validation" novalidate>
+    {% csrf_token %}
+
+    <!-- Name Field -->
+    <div class="row">
+      <div class="col-md-12 mb-3">
+        <label class="form-label">{{ form.name.label }}</label>
+        {{ form.name|add_class:"form-control"|attr:"placeholder:Nome do projeto" }}
+        {% if form.name.errors %}
+          <div class="invalid-feedback d-block">
+            {% for error in form.name.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Categoria e Deadline-->
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">{{ form.categoria.label }}</label>
+        {{ form.categoria|add_class:"form-control" }}
+        {% if form.categoria.errors %}
+          <div class="invalid-feedback d-block">
+            {% for error in form.categoria.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <div class="col-md-6 mb-3">
+        <label class="form-label">{{ form.prazofinal.label }}</label>
+        {{ form.prazofinal|add_class:"form-control" }}
+        {% if form.prazofinal.errors %}
+          <div class="invalid-feedback d-block">
+            {% for error in form.prazofinal.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+        <small class="form-text text-muted">Selecione uma data futura</small>
+      </div>
+    </div>
+
+    <!-- Descrição -->
+    <div class="mb-3">
+      <label class="form-label">{{ form.descricao.label }}</label>
+      {{ form.descricao|add_class:"form-control"|attr:"rows:4" }}
+      {% if form.descricao.errors %}
+        <div class="invalid-feedback d-block">
+          {% for error in form.descricao.errors %}
+            {{ error }}
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Botões -->
+    <div class="d-flex justify-content-between mt-4">
+      <button type="submit" class="btn btn-success">
+        {% if object %}Atualizar{% else %}Criar{% endif %} Projeto
+      </button>
+      <a href="{% url 'projetos_list' %}" class="btn btn-secondary">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+<!-- Bootstrap  -->
+<script>
+(() => {
+  'use strict'
+  const forms = document.querySelectorAll('.needs-validation')
+  
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>
+
+<style>
+/* styling */
+.invalid-feedback {
+  display: none;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: #dc3545;
+}
+
+.was-validated .form-control:invalid ~ .invalid-feedback {
+  display: block;
+}
+
+/* Espaçamento pro textarea */
+textarea.form-control {
+  min-height: 120px;
+}
+</style>
+{% endblock %}

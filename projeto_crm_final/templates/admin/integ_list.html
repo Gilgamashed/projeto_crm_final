@@ -1,0 +1,31 @@
+{% extends 'projeto_crm_final/base.html' %}
+{% load widget_tweaks %}
+{% block title %}Lista de Integrantes{% endblock %}
+
+{% block content %}
+
+  <main class="main-scroll">
+    <div class="container-fluid">
+      <div class="row g-3">
+        {% for person in integrantes %}
+          <div class="col-12">
+            <div class="card vaga-card shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title mb-2">{{ person.user.get_full_name|capfirst }}</h5>
+                <h6 class="card-title mb-2">{{ person.cargo }} <span class="text-muted">({{ person.role|capfirst }})</span></h6>
+                <p class="card-text mb-2"><i class="bi bi-geo-alt-fill"></i> {{ person.equipe }}</p>
+
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-muted text-center">Nenhuma integrante encontrado.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </main>
+
+
+{% endblock %}
+
+

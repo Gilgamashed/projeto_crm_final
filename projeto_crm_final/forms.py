@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from projeto_crm_final.models import Integrantes
+from .models import Integrantes, Projetos
 
 
 class SignupForm(UserCreationForm):
@@ -96,3 +96,37 @@ class SignupForm(UserCreationForm):
             "Evite usar informações pessoais."
         )
         self.fields['password2'].help_text = "Repita a senha para verificação."
+
+
+class ProjetosForm(forms.ModelForm):
+    class Meta:
+        model = Projetos
+        fields = ['name', 'descricao', 'categoria', 'prazofinal',]
+        widgets = {'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Nome do projeto'}),
+                   'descricao': forms.Textarea(attrs={'class': 'form-control'}),
+                   'categoria': forms.Select(attrs={'class': 'form-control'}),
+                   'prazofinal': forms.DateInput(attrs={
+                       'class':'form-control',
+                       'type':'date',
+                       'help_text':'Selecione uma data futura'})
+                   }
+        labels = {'name' : 'Nome do projeto*',
+                  'descricao' : 'Descrição do projeto',
+                  'categoria' : 'Categoria',
+                  'prazofinal' : 'Prazo Final*'}
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if self.instance and self.instance.pk:
+            if Projetos.objects.filter(name=name, status="active").exclude(pk=self.instance.pk).exists():
+                raise forms.ValidationError("Um projeto com este nome já está ativo.")
+        else:
+            if Projetos.objects.filter(name=name, status="active").exists():
+                raise forms.ValidationError("Um projeto com este nome já está ativo.")
+        return name
+
+    def clean_prazofinal(self):
+        date = self.cleaned_data['prazofinal']
+        if date <= date.today():
+            raise forms.ValidationError("Prazo deve ser uma data futura!")
+        return date

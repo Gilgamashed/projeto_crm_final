@@ -1,13 +1,13 @@
 #importar no models.py e forms.py
 
 STATUS = [
-    ('parafazer','Para fazer'),
-    ('emanalise','Em analise'),
+    ('todo','Para fazer'),
+    ('analise','Em analise'),
     ('debater','A debater'),
     ('emandamento','Em andamento'),
-    ('feito','Feito'),
-    ('atrasada','Atrasada'),
-    ('Cancelada','Cancelada')
+    ('done','Feito'),
+    ('late','Atrasada'),
+    ('canceled','Cancelada')
 ]
 
 HIERARCH = [
@@ -18,8 +18,17 @@ HIERARCH = [
 ]
 
 CATEGORIA = [
+    ('null', 'Não específico'),
     ('dev', 'dev'),
 ]
+
+STATUSPROJETO = [
+    ('active', 'Ativo'),
+    ('canceled', 'Cancelado'),
+    ('expired', 'Data vencida'),
+    ('done','Concluído')
+]
+
 PRIORIDADE = [
     ('baixa','Baixa'),
     ('regular', 'Regular'),

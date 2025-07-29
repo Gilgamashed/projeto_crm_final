@@ -53,11 +53,25 @@
                 <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
                 {% endif %}
             </li>
+                            <!-- navbar Projetos -->
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="{% url 'projetos_list' %} ">Projetos</a>
+            </li>
+            {% endif %}
 
               <!-- navbar ADMIN only -->
             {% if user.is_authenticated and is_admin %}
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="{% url 'send_invite' %}">Convidar</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                Ferramentas Admin
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/admin/lista_integrantes">Lista de Integrantes</a></li>
+                <li><a class="dropdown-item" href="#">Another action</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">Something else here</a></li>
+              </ul>
             </li>
             {% endif %}
 

@@ -20,7 +20,8 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path
 from django.views.decorators.http import require_POST
 
-from projeto_crm_final.views import SignUpView, HomeView, PassResetView, DashboardView, IntegrantesGetView
+from projeto_crm_final.views import SignUpView, HomeView, PassResetView, DashboardView, IntegrantesGetView, \
+    UpdateRoleView, IntegrantesListaView, ProjetosCreateView, ProjetosUpdateView, ProjetosView, ProjetosGetView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -30,6 +31,14 @@ urlpatterns = [
     path('account/login/', LoginView.as_view(template_name='account/login.html'), name='account_login'),
     path('account/logout/', require_POST(LogoutView.as_view(next_page='home')), name='account_logout'),
     path("account/profile/<uuid:person_id>/", IntegrantesGetView.as_view(), name='account_user_detail'),
+    path('update_role/', UpdateRoleView.as_view(), name='update_role'),
     path('account/signup/', SignUpView.as_view(), name='account_signup'),
     path('account/password_reset/', PassResetView.as_view(), name='account_reset_password'),
+
+    path('admin/lista_integrantes', IntegrantesListaView.as_view(), name='admin_integ_list'),
+
+    path('projetos/', ProjetosView.as_view() , name='projetos_list'),
+    path('projetos/novo/', ProjetosCreateView.as_view(), name='projetos_create'),
+    path('projetos/editar/<int:pk>/', ProjetosUpdateView.as_view(), name='projetos_edit'),
+    path("projetos/<int:projeto_id>", ProjetosGetView.as_view(), name='projetos_detail'),
 ]
