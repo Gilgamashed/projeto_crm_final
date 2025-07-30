@@ -56,14 +56,28 @@ Logs
 
 TODO
 	Sistema de autenticação
-	    invite_user views.py
-	    signup.html
-	    contatoadmin.html
+	    como user vira admin/lead? convite?
 	    cobrir com testes
 
 	Implementar CRUD para tarefas básico
+	ok    botao novo projeto da 403 para membros - criar popup negando acesso?
+	    pagina de detalhes do projeto
+	    criador da tarefa pode edita-la
+	ok    investigar tab cancelado e concluidos
+	ok    criar categorias para projetos
+	ok    filtros por categoria
+	    enviar relatorio ao concluir projeto
+	    cobrir com testes
+
 
 	Management de equipe
+	    perfil de usuario - mais info cargo por exemplo
+	    perfil pode ser visto por outros? sistema de menssagens interno?
+	    CRUD de equipes
+	    perfil de grupo
+	    lider pode criar tarefas dentro do projeto
+	    enviar relatorio de conclusao dee tarefas?
+	    sistema de convite
 
 	Fazer o log
 

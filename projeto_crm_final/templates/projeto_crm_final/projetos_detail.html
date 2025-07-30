@@ -1,16 +1,47 @@
 {% extends 'projeto_crm_final/base.html' %}
 {% load widget_tweaks %}
-{% block title %}Bem Vindo!{% endblock %}
+{% block title %}Projeto{{ projeto.name|capfirst }}{% endblock %}
 {% block content %}
-    <h2>Home</h2>
-    {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-{%if 'error' in message.tags %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% endfor %}
-    {% endif %}
-{% endblock %}
 
+
+<div class="container mt-5">
+  <div class="card">
+    <div class="card-header">
+      <h1>{{ projeto.name|capfirst }} - {{ projeto.status }} {{ projeto.get_status_display }}</h1>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Iniciado por:</strong> {{projeto.criador|capfirst}}</p>
+          <p class="badge bg-light text-dark">><strong>{{projeto.categoria}}</strong></p>
+          <p> {{projeto.descricao}}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Equipe:</strong> {{ projeto.equipe|default:"Aguardando..." }}</p>
+          <p><strong>Iniciado:</strong> {{ projeto.inicio }}</p>
+          <p><strong>Prazo:</strong> {{ projeto.prazofinal }}</p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <a href="{% url 'dashboard' %}" class="btn btn-primary">
+          Voltar à sua home
+        </a><span> <a href="{% url 'projetos_list' %}" class="btn btn-primary">
+          Voltar à lista de projetos
+        </a></span>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Status colors */
+.status-active { color: #28a745; }
+.status-overdue { color: #dc3545; font-weight: bold; }
+.status-canceled { color: #6c757d; }
+.status-done { color: #007bff; }
+.status-pending { color: #ffc107; }
+</style>
+
+{% endblock %}
 

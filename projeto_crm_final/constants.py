@@ -20,6 +20,16 @@ HIERARCH = [
 CATEGORIA = [
     ('null', 'Não específico'),
     ('dev', 'dev'),
+    ('TI', 'Tecnologia da Informação'),
+    ('MK', 'Marketing'),
+    ('VD', 'Vendas'),
+    ('FN', 'Finanças'),
+    ('RH', 'Recursos Humanos'),
+    ('CS', 'Serviço ao Cliente'),
+    ('OP', 'Operações'),
+    ('PD', 'Pesquisa & Desenvolvimento'),
+    ('LG', 'Logística'),
+    ('JR', 'Jurídico'),
 ]
 
 STATUSPROJETO = [

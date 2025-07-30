@@ -22,12 +22,12 @@ class AdminRequiredMixin:
 class LeadRequiredMixin(UserPassesTestMixin):
     """Mixin para permitir criação de projetos apenas por LEADS ou ADMIN"""
     permission_denied_message = "Apenas líderes de equipe e administradores podem criar projetos"
-    redirect_url = 'home'
+    redirect_url = 'projetos-list'
 
     def test_func(self):
         # Só prossegue se usuario estiver logado
         if not self.request.user.is_authenticated:
-            return False
+            return redirect('login')
 
         try:
             integrante = Integrantes.objects.get(user=self.request.user)

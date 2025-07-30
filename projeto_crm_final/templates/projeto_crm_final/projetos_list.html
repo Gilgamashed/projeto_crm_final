@@ -8,35 +8,76 @@
     <!-- header e botao de criar-->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1>Lista de Projetos</h1>
-      <a href="{% url 'projetos_create' %}" class="btn btn-success">
-        <i class="bi bi-plus-lg"></i> Novo Projeto
-      </a>
+      {% if can_create %}
+        <a href="{% url 'novo_projeto' %}" class="btn btn-success">
+          <i class="bi bi-plus-lg"></i> Novo Projeto
+        </a>
+      {% else %}
+        <button class="btn btn-secondary"
+                title="Apenas líderes e administradores podem criar projetos"
+                data-bs-toggle="tooltip"
+                data-bs-placement="left">
+          <i class="bi bi-plus-lg"></i> Novo Projeto
+        </button>
+      {% endif %}
     </div>
 
     <!-- filtros -->
-    <ul class="nav nav-tabs mb-4">
-      <li class="nav-item">
-        <a class="nav-link {% if not request.GET.status %}active{% endif %}"
-           href="?">Todos</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link {% if request.GET.status == 'active' %}active{% endif %}"
-           href="?status=active">Ativos</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link {% if request.GET.status == 'canceled' %}active{% endif %}"
-           href="?status=overdue">Cancelado</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link {% if request.GET.status == 'overdue' %}active{% endif %}"
-           href="?status=overdue">Atrasados</a>
-      </li>
-            <li class="nav-item">
-        <a class="nav-link {% if request.GET.status == 'done' %}active{% endif %}"
-           href="?status=overdue">Concluídos</a>
-      </li>
-    </ul>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <!-- Status do projeto -->
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link {% if not request.GET.status %}active{% endif %}"
+             href="?">Todos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.GET.status == 'active' %}active{% endif %}"
+             href="?status=active">Ativos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.GET.status == 'canceled' %}active{% endif %}"
+             href="?status=canceled">Cancelado</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.GET.status == 'overdue' %}active{% endif %}"
+             href="?status=overdue">Atrasados</a>
+        </li>
+              <li class="nav-item">
+          <a class="nav-link {% if request.GET.status == 'done' %}active{% endif %}"
+             href="?status=done">Concluídos</a>
+        </li>
+      </ul>
 
+      <!-- Categoria do projeto -->
+      <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                id="categoryFilter" data-bs-toggle="dropdown" aria-expanded="false">
+          {% if current_categoria %}
+            {% for key, value in categorias %}
+              {% if key == current_categoria %}{{ value }}{% endif %}
+            {% endfor %}
+          {% else %}
+            Categorias
+          {% endif %}
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="categoryFilter">
+          <li><a class="dropdown-item" href="?{% if current_status %}status={{ current_status }}{% endif %}">
+            Categorias
+          </a></li>
+          <li><hr class="dropdown-divider"></li>
+          {% for key, value in categorias %}
+            <li>
+              <a class="dropdown-item"
+                 href="?{% if current_status %}status={{ current_status }}&{% endif %}categoria={{ key }}">
+                {{ value }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+      <!-- lisat de projetos -->
     <div class="row g-3">
       {% for projeto in projetos %}
         <div class="col-md-6 col-lg-4">
@@ -55,7 +96,7 @@
 
               <p class="card-text mb-2">
                 <i class="bi bi-people-fill"></i>
-                Equipe: {{ projeto.equipe|default:"Aguardando" }}
+                Equipe: {{ projeto.equipe|default:"Aguardando..." }}
               </p>
 
               <p class="card-text mb-2">
@@ -84,11 +125,22 @@
           <div class="alert alert-info text-center">
             <i class="bi bi-inbox"></i> Nenhum projeto encontrado
           </div>
+          {% if can_create %}
           <div class="text-center">
             <a href="{% url 'projetos_create' %}" class="btn btn-primary">
-              Criar Primeiro Projeto
+              Crie um Projeto
             </a>
           </div>
+          {% else %}
+          <div class="text-center">
+            <button class="btn btn-secondary"
+          title="Apenas líderes e administradores podem criar projetos"
+          data-bs-toggle="tooltip"
+          data-bs-placement="left">
+              Crie um Projeto
+            </button>
+          </div>
+          {% endif %}
         </div>
       {% endfor %}
     </div>
@@ -148,5 +200,15 @@
   font-weight: 600;
 }
 </style>
+
+<script>
+// tooltip
+document.addEventListener('DOMContentLoaded', function() {
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+})
+</script>
 
 {% endblock %}

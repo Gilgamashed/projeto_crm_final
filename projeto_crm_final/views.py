@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, DeleteView, UpdateView
 
-from projeto_crm_final.constants import HIERARCH
+from projeto_crm_final.constants import HIERARCH, CATEGORIA
 from projeto_crm_final.forms import SignupForm, ProjetosForm
 from projeto_crm_final.mixins import AdminRequiredMixin, LeadRequiredMixin
 from projeto_crm_final.models import Integrantes, Projetos
@@ -80,9 +80,32 @@ class ProjetosView(ListView):
 
     def get_queryset(self):
         status = self.request.GET.get('status')
+        categoria = self.request.GET.get('categoria')
+        queryset = Projetos.objects.all()
+
         if status:
-            return Projetos.objects.filter(status=status)
-        return Projetos.objects.all()
+            queryset = queryset.filter(status=status)
+        if categoria:
+            queryset = queryset.filter(categoria=categoria)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Checagem para criação de novos projetos
+        context['can_create'] = False
+        if self.request.user.is_authenticated:
+            try:
+                integrante = Integrantes.objects.get(user=self.request.user)
+                context['can_create'] = integrante.role in ['ADMIN', 'LEAD']
+            except Integrantes.DoesNotExist:
+                pass
+
+        context['categorias'] = CATEGORIA
+
+        context['current_status'] = self.request.GET.get('status', '')
+        context['current_categoria'] = self.request.GET.get('categoria', '')
+
+        return context
 
 class ProjetosCreateView(LoginRequiredMixin, LeadRequiredMixin, CreateView):
     model = Projetos
