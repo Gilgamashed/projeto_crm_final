@@ -21,7 +21,8 @@ from django.urls import path
 from django.views.decorators.http import require_POST
 
 from projeto_crm_final.views import SignUpView, HomeView, PassResetView, DashboardView, IntegrantesGetView, \
-    UpdateRoleView, IntegrantesListaView, ProjetosCreateView, ProjetosUpdateView, ProjetosView, ProjetosGetView
+    UpdateRoleView, IntegrantesListaView, ProjetosCreateView, ProjetosUpdateView, ProjetosView, ProjetosGetView, \
+    ProjetosDeleteView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -41,4 +42,5 @@ urlpatterns = [
     path('projetos/novo/', ProjetosCreateView.as_view(), name='projetos_create'),
     path('projetos/editar/<int:pk>/', ProjetosUpdateView.as_view(), name='projetos_edit'),
     path("projetos/<int:projeto_id>", ProjetosGetView.as_view(), name='projetos_detail'),
+    path('projetos/<int:pk>/excluir/', ProjetosDeleteView.as_view(), name='projetos_delete'),
 ]

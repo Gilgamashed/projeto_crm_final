@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.shortcuts import redirect
 
-from projeto_crm_final.models import Integrantes
+from projeto_crm_final.models import Integrantes, Projetos
 
 
 class AdminRequiredMixin:
@@ -35,3 +35,23 @@ class LeadRequiredMixin(UserPassesTestMixin):
 
         except Integrantes.DoesNotExist:
             return False
+
+class ProjetoOwnerMixin:
+    """ Mixin para possibilitar edição de projetos apenas por seus criadores
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+        projeto = self.get_object()
+
+        try:
+            integrante = request.user.integrantes
+        except AttributeError:
+            messages.error(request, "Você não tem permissão para modificar projetos")
+            return redirect('projetos_list')
+
+        # Checar se usuario é criador do projeto
+        if projeto.criador != integrante:
+            messages.error(request, "Apenas os criadores do projeto podem modificá-lo")
+            return redirect('projetos_list')
+
+        return super().dispatch(request, *args, **kwargs)

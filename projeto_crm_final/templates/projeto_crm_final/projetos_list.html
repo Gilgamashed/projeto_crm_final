@@ -9,16 +9,18 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1>Lista de Projetos</h1>
       {% if can_create %}
-        <a href="{% url 'novo_projeto' %}" class="btn btn-success">
+        <a href="{% url 'projetos_create' %}" class="btn btn-success">
           <i class="bi bi-plus-lg"></i> Novo Projeto
         </a>
       {% else %}
+        <!--
         <button class="btn btn-secondary"
                 title="Apenas líderes e administradores podem criar projetos"
                 data-bs-toggle="tooltip"
                 data-bs-placement="left">
           <i class="bi bi-plus-lg"></i> Novo Projeto
         </button>
+        -->
       {% endif %}
     </div>
 
@@ -132,14 +134,7 @@
             </a>
           </div>
           {% else %}
-          <div class="text-center">
-            <button class="btn btn-secondary"
-          title="Apenas líderes e administradores podem criar projetos"
-          data-bs-toggle="tooltip"
-          data-bs-placement="left">
-              Crie um Projeto
-            </button>
-          </div>
+
           {% endif %}
         </div>
       {% endfor %}
@@ -201,6 +196,7 @@
 }
 </style>
 
+<!-- script pra tooltip do bootstrap
 <script>
 // tooltip
 document.addEventListener('DOMContentLoaded', function() {
@@ -210,5 +206,6 @@ document.addEventListener('DOMContentLoaded', function() {
   })
 })
 </script>
+-->
 
 {% endblock %}

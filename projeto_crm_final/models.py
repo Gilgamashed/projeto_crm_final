@@ -15,6 +15,7 @@ class Integrantes(models.Model):
     role = models.CharField(max_length=20,choices=HIERARCH,default='MEMBER',null=False,blank=False)
     cargo = models.CharField(max_length=20, default='Desligado')
     equipe = models.CharField(max_length=20, default='Sem equipe')
+    related_name = 'integrantes'
 
     def save(self, *args, **kwargs):
         self.user.first_name = self.nome
@@ -23,7 +24,7 @@ class Integrantes(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.user.nome
+        return f"{self.nome} {self.sobrenome}"
 
 
 class Equipes(models.Model):
@@ -60,7 +61,7 @@ class Tarefas(models.Model):
     prioridade = models.CharField(max_length=10, choices=PRIORIDADE)
 
     def __str__(self):
-        return f"{self.tarefa} - {self.status} - {self.prazo}"
+        return f"{self.tarefa} - {self.status} - {self.prazofinal}"
 
 class AuditLog(models.Model):
     usuario = models.ForeignKey(Integrantes, on_delete=models.SET_NULL, null=True)

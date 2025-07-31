@@ -1,0 +1,10 @@
+{% extends 'projeto_crm_final/base.html' %}
+{% block title %}Confirmar Exclusão{% endblock %}
+{% block content %}
+<h2>Deseja abortar projeto "{{ projeto|capfirst }}"?</h2>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Confirmar</button>
+    <a href="{%url 'projetos_list' %}" class="btn btn-secondary">Voltar</a>
+</form>
+{% endblock %}

@@ -1,38 +1,7 @@
 {% extends 'projeto_crm_final/base.html' %}
 {% load widget_tweaks %}
-{% block title %}Projeto{{ projeto.name|capfirst }}{% endblock %}
+{% block title %}{{ projeto.name|capfirst }}{% endblock %}
 {% block content %}
-
-
-<div class="container mt-5">
-  <div class="card">
-    <div class="card-header">
-      <h1>{{ projeto.name|capfirst }} - {{ projeto.status }} {{ projeto.get_status_display }}</h1>
-    </div>
-    <div class="card-body">
-      <div class="row">
-        <div class="col-md-6">
-          <p><strong>Iniciado por:</strong> {{projeto.criador|capfirst}}</p>
-          <p class="badge bg-light text-dark">><strong>{{projeto.categoria}}</strong></p>
-          <p> {{projeto.descricao}}</p>
-        </div>
-        <div class="col-md-6">
-          <p><strong>Equipe:</strong> {{ projeto.equipe|default:"Aguardando..." }}</p>
-          <p><strong>Iniciado:</strong> {{ projeto.inicio }}</p>
-          <p><strong>Prazo:</strong> {{ projeto.prazofinal }}</p>
-        </div>
-      </div>
-      <div class="mt-4">
-        <a href="{% url 'dashboard' %}" class="btn btn-primary">
-          Voltar à sua home
-        </a><span> <a href="{% url 'projetos_list' %}" class="btn btn-primary">
-          Voltar à lista de projetos
-        </a></span>
-
-      </div>
-    </div>
-  </div>
-</div>
 
 <style>
 /* Status colors */
@@ -43,5 +12,93 @@
 .status-pending { color: #ffc107; }
 </style>
 
-{% endblock %}
+<div class="container mt-5">
+  <div class="card">
+    <div class="card-header">
+      <h1>{{ projeto.name|capfirst }} -
+      <span class="status-{{ projeto.status|lower }}">{{ projeto.get_status_display }}</span>
+      </h1>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <p class="badge bg-light text-dark"><strong>{{ projeto.get_categoria_display }}</strong></p>
+          <p><strong>Iniciado por:</strong> {{ projeto.criador.nome|capfirst }} {{ projeto.criador.sobrenome|capfirst }}</p>
+          <p> {{projeto.descricao}}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Equipe:</strong> {{ projeto.equipe|default:"Aguardando..." }}</p>
+          <p><strong>Iniciado:</strong> {{ projeto.inicio }}</p>
+          <p><strong>Prazo:</strong> {{ projeto.prazofinal }}</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
 
+          <!-- area do criador -->
+        </div>
+        {% if projeto.criador == request.user.integrantes %}
+        <div class="col-md-6">
+          <a href="{% url 'projetos_edit' projeto.pk %}" class="btn btn-warning btn-sm">
+            Atualizar projeto
+          </a> <button class="btn btn-danger btn-sm"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modalExcluir"
+                       data-id="{{ projeto.pk }}"
+                       data-name="{{ projeto.name }}">
+            Cancelar projeto
+          </button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="mt-4">
+    <a href="{% url 'dashboard' %}" class="btn btn-primary">
+      Voltar à sua home
+    </a><span> <a href="{% url 'projetos_list' %}" class="btn btn-primary">
+      Voltar à lista de projetos
+    </a></span>
+  </div>
+</div>
+
+<!-- Modal excluir projeto -->
+<div class="modal fade" id="modalExcluir" tabindex="-1" aria-labelledby="modalExcluirLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+    <form method="post" id="formExclusao">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="modalExcluirLabel">Confirmar Cancelamento</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Tem certeza que deseja abortar o projeto <strong id="projetoName"></strong>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        <button type="submit" class="btn btn-danger">Confirmar</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+<script>
+    // modalExcluir
+    const modalExcluir = document.getElementById('modalExcluir');
+    const projetoName = document.getElementById('projetoName');
+    const formExclusao = document.getElementById('formExclusao');
+
+    modalExcluir.addEventListener('show.bs.modal', function(event) {
+        const botaoExcluir = event.relatedTarget;
+        const projetoId = botaoExcluir.getAttribute('data-id');
+        const name = botaoExcluir.getAttribute('data-name');
+
+        projetoName.textContent += name;
+        formExclusao.action = `/projetos/${projetoId}/excluir/`;
+    });
+</script>
+
+
+{% endblock %}

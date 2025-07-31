@@ -54,19 +54,25 @@ Logs
 	quem pode ver?
 
 
-TODO
+lista
 	Sistema de autenticação
 	    como user vira admin/lead? convite?
+	    lista de integrantes?
 	    cobrir com testes
+
 
 	Implementar CRUD para tarefas básico
 	ok    botao novo projeto da 403 para membros - criar popup negando acesso?
-	    pagina de detalhes do projeto
-	    criador da tarefa pode edita-la
+	ok    pagina de detalhes do projeto
+	ok        criador da tarefa pode edita-la
+	        botao de entrega e
+	        enviar relatorio ao concluir projeto
+	        adicionar tarefas ao projeto
+    ok    remover botão de adicionar projeto para membros.
 	ok    investigar tab cancelado e concluidos
 	ok    criar categorias para projetos
 	ok    filtros por categoria
-	    enviar relatorio ao concluir projeto
+	      deletar nao deleta mas deixa arquivado e ineditavel?
 	    cobrir com testes
 
 

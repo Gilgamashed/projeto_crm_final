@@ -67,10 +67,14 @@
 
     <!-- Botões -->
     <div class="d-flex justify-content-between mt-4">
+    {% if object %}
+      <a href="{% url 'projetos_detail' object.id %}" class="btn btn-secondary">Cancelar</a>
+    {% else %}
+      <a href="{% url 'projetos_list' %}" class="btn btn-secondary">Cancelar</a>
+    {% endif %}
       <button type="submit" class="btn btn-success">
         {% if object %}Atualizar{% else %}Criar{% endif %} Projeto
       </button>
-      <a href="{% url 'projetos_list' %}" class="btn btn-secondary">Cancelar</a>
     </div>
   </form>
 </div>

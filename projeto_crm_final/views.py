@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,7 +11,7 @@ from django.views.generic import TemplateView, CreateView, DetailView, ListView,
 
 from projeto_crm_final.constants import HIERARCH, CATEGORIA
 from projeto_crm_final.forms import SignupForm, ProjetosForm
-from projeto_crm_final.mixins import AdminRequiredMixin, LeadRequiredMixin
+from projeto_crm_final.mixins import AdminRequiredMixin, LeadRequiredMixin, ProjetoOwnerMixin
 from projeto_crm_final.models import Integrantes, Projetos
 
 
@@ -72,7 +73,7 @@ class UpdateRoleView(LoginRequiredMixin, View):
 
 #--------------- PROJETOS
 
-class ProjetosView(ListView):
+class ProjetosView(LoginRequiredMixin, ListView):
     model= Projetos
     template_name='projeto_crm_final/projetos_list.html'
     context_object_name= 'projetos'
@@ -119,21 +120,37 @@ class ProjetosCreateView(LoginRequiredMixin, LeadRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
-class ProjetosUpdateView(LoginRequiredMixin, UpdateView):
+class ProjetosUpdateView(LoginRequiredMixin, LeadRequiredMixin, ProjetoOwnerMixin, UpdateView):
     model = Projetos
     form_class = ProjetosForm
     template_name = 'projeto_crm_final/projetos_form.html'
     success_url = reverse_lazy('projetos_list')
 
-class ProjetosGetView(DetailView):
+class ProjetosGetView(LoginRequiredMixin, DetailView):
     model = Projetos
     template_name = "projeto_crm_final/projetos_detail.html"
     context_object_name = "projeto"
     pk_url_kwarg = "projeto_id"
 
-class ProjetosDeleteView(LoginRequiredMixin, DeleteView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Checagem para criação de novos projetos
+        context['can_create'] = False
+        if self.request.user.is_authenticated:
+            try:
+                integrante = Integrantes.objects.get(user=self.request.user)
+                context['can_create'] = integrante.role in ['ADMIN', 'LEAD']
+            except Integrantes.DoesNotExist:
+                pass
+        return context
+
+class ProjetosDeleteView(LoginRequiredMixin,LeadRequiredMixin, ProjetoOwnerMixin, DeleteView):
     model = Projetos
     template_name = 'projeto_crm_final/projetos_confirm_del.html'
     success_url = reverse_lazy('projetos_list')
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, "Projeto cancelado com sucesso!")
+        return super().delete(request, *args, **kwargs)
 
 
