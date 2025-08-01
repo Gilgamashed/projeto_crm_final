@@ -3,6 +3,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
@@ -10,9 +11,9 @@ from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, DeleteView, UpdateView
 
 from projeto_crm_final.constants import HIERARCH, CATEGORIA
-from projeto_crm_final.forms import SignupForm, ProjetosForm
+from projeto_crm_final.forms import SignupForm, ProjetosForm, EquipesForm
 from projeto_crm_final.mixins import AdminRequiredMixin, LeadRequiredMixin, ProjetoOwnerMixin
-from projeto_crm_final.models import Integrantes, Projetos
+from projeto_crm_final.models import Integrantes, Projetos, Tarefas, Equipes
 
 
 class HomeView(TemplateView):
@@ -69,6 +70,60 @@ class UpdateRoleView(LoginRequiredMixin, View):
             return JsonResponse({'status': 'success', 'new_role': integrante.get_role_display()})
         except Integrantes.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+
+
+#--------------- EQUIPES
+
+class EquipesView(LoginRequiredMixin, ListView):
+    model = Equipes
+    template_name = 'projeto_crm_final/equipes_list.html'
+    context_object_name = 'equipes'
+
+
+class EquipesCreateView(LoginRequiredMixin, CreateView):
+    model = Equipes
+    form_class = EquipesForm
+    template_name = 'projeto_crm_final/equipes_form.html'
+    success_url = reverse_lazy('dashboard')
+
+    def form_valid(self, form):
+        try:
+            # pega o criador
+            creator = self.request.user.integrante
+        except AttributeError:
+            messages.error(self.request, "User profile not found. Create a profile first.")
+            return self.form_invalid(form)
+        # coloca criador como lider
+        form.instance.leader = creator
+        # salva
+        team = form.save()
+        # update role e equipe
+        creator.role = 'LEAD'
+        creator.equipe = team
+        creator.save()
+        #adiciona criador ao membros da Equipes
+        team.membros.add(creator)
+        return super().form_valid(form)
+
+
+class EquipesUpdateView(LoginRequiredMixin, LeadRequiredMixin, UpdateView):
+    model = Equipes
+    form_class = EquipesForm
+    template_name = 'projeto_crm_final/equipes_form.html'
+    success_url = reverse_lazy('')
+
+
+class EquipesGetView(LoginRequiredMixin, DetailView):
+    model = Equipes
+    template_name = "projeto_crm_final/equipes_detail.html"
+    context_object_name = "equipe"
+    pk_url_kwarg = "equipe_id"
+
+
+class EquipesDeleteView(LoginRequiredMixin, LeadRequiredMixin, DeleteView):
+    model = Equipes
+    template_name = 'projeto_crm_final/equipes_confirm_del.html'
+    success_url = reverse_lazy('')
 
 
 #--------------- PROJETOS
@@ -154,3 +209,35 @@ class ProjetosDeleteView(LoginRequiredMixin,LeadRequiredMixin, ProjetoOwnerMixin
         return super().delete(request, *args, **kwargs)
 
 
+
+#--------------- TAREFAS
+"""
+class TarefasView(LoginRequiredMixin, ListView):
+    model= Tarefas
+    template_name=
+    context_object_name= 'tarefas'
+
+class TarefasCreateView(LoginRequiredMixin, LeadRequiredMixin, CreateView):
+    model = Tarefas
+    form_class = TarefasForm
+    template_name = 'projeto_crm_final/tarefas_form.html'
+    success_url = reverse_lazy('')
+
+class TarefasUpdateView(LoginRequiredMixin, LeadRequiredMixin, ProjetoOwnerMixin, UpdateView):
+    model = Tarefas
+    form_class = TarefasForm
+    template_name = 'projeto_crm_final/tarefas_form.html'
+    success_url = reverse_lazy('')
+
+class TarefasGetView(LoginRequiredMixin, DetailView):
+    model = Tarefas
+    template_name = "projeto_crm_final/tarefas_detail.html"
+    context_object_name = "tarefa"
+    pk_url_kwarg = "tarefa_id"
+
+class TarefasDeleteView(LoginRequiredMixin,LeadRequiredMixin, ProjetoOwnerMixin, DeleteView):
+    model = Tarefas
+    template_name = 'projeto_crm_final/tarefas_confirm_del.html'
+    success_url = reverse_lazy('')
+
+"""

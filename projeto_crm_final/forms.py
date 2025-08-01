@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Integrantes, Projetos
+from .models import Integrantes, Projetos, Tarefas, Equipes
 
 
 class SignupForm(UserCreationForm):
@@ -67,14 +67,17 @@ class SignupForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.first_name = self.cleaned_data['nome']
+        user.last_name = self.cleaned_data['sobrenome']
         user.save()  # Save user first
 
-        # Create Integrantes with synced names
+        # models User e Integrantes são diferentes - abaixo ele passa a informação do User para o Integrantes
         Integrantes.objects.create(
             user=user,
             nome=self.cleaned_data['nome'],
             sobrenome=self.cleaned_data['sobrenome'],
-            telefone=self.cleaned_data.get('telefone')
+            telefone=self.cleaned_data.get('telefone','')
         )
         return user
 
@@ -96,6 +99,17 @@ class SignupForm(UserCreationForm):
             "Evite usar informações pessoais."
         )
         self.fields['password2'].help_text = "Repita a senha para verificação."
+
+
+class EquipesForm(forms.ModelForm):
+    class Meta:
+        model = Equipes
+        fields = ['name', 'descricao', 'leader']
+        widgets = {'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Nome da equipe'}),
+                   'descricao': forms.Textarea(attrs={
+                       'class': 'form-control', 'placeholder':'Breve descrição da equipe'}),
+                        'leader': forms.HiddenInput(),
+                   }
 
 
 class ProjetosForm(forms.ModelForm):
@@ -130,3 +144,10 @@ class ProjetosForm(forms.ModelForm):
         if date <= date.today():
             raise forms.ValidationError("Prazo deve ser uma data futura!")
         return date
+
+
+class TarefasForm(forms.ModelForm):
+    class Meta:
+        model = Tarefas
+        fields = ['tarefa', 'descricao', 'prazofinal', 'prioridade']
+        widgets = {}

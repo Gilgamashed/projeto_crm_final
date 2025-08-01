@@ -68,6 +68,11 @@ lista
 	        botao de entrega e
 	        enviar relatorio ao concluir projeto
 	        adicionar tarefas ao projeto
+	            CRUD de tarefas
+	            lista de tarefas na pagina de projetos
+	            opção de criar nova tarefa
+	            detalhes da tarefa com espaço pra observações?
+	            enviar relatorio de tarefa individualmente
     ok    remover botão de adicionar projeto para membros.
 	ok    investigar tab cancelado e concluidos
 	ok    criar categorias para projetos

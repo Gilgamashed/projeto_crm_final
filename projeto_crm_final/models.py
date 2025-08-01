@@ -7,15 +7,18 @@ from .constants import HIERARCH, STATUS, PRIORIDADE, CATEGORIA, STATUSPROJETO
 
 
 class Integrantes(models.Model):
-    person_id = models.UUIDField(primary_key=True, default=uuid.uuid4(),editable=False)
+    person_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, unique=True, on_delete=models.CASCADE, max_length=20)
     nome = models.CharField(max_length=25)
     sobrenome = models.CharField(max_length=100)
     telefone = models.CharField(max_length=20, blank=True)
     role = models.CharField(max_length=20,choices=HIERARCH,default='MEMBER',null=False,blank=False)
     cargo = models.CharField(max_length=20, default='Desligado')
-    equipe = models.CharField(max_length=20, default='Sem equipe')
-    related_name = 'integrantes'
+    equipe = models.ForeignKey('Equipes', on_delete=models.SET_NULL, null=True, blank=True, max_length=20)
+
+    @property
+    def email(self):
+        return self.user.email
 
     def save(self, *args, **kwargs):
         self.user.first_name = self.nome
@@ -28,8 +31,9 @@ class Integrantes(models.Model):
 
 
 class Equipes(models.Model):
-    nome = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     descricao = models.TextField()
+    leader = models.ForeignKey(Integrantes, on_delete=models.CASCADE, related_name="team_boss")
     membros = models.ManyToManyField(Integrantes)
 
     def __str__(self):
