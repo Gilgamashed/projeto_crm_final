@@ -104,12 +104,42 @@ class SignupForm(UserCreationForm):
 class EquipesForm(forms.ModelForm):
     class Meta:
         model = Equipes
-        fields = ['name', 'descricao', 'leader']
-        widgets = {'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Nome da equipe'}),
-                   'descricao': forms.Textarea(attrs={
-                       'class': 'form-control', 'placeholder':'Breve descrição da equipe'}),
-                        'leader': forms.HiddenInput(),
-                   }
+        fields = ['name', 'descricao']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nome da equipe'
+            }),
+            'descricao': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Breve descrição da equipe',
+                'rows': 4
+            }),
+        }
+
+        #O lider não é necessario pq vem da view
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+
+        self.fields['leader'] = forms.ModelChoiceField(
+            queryset=Integrantes.objects.all(),
+            required=False,
+            widget=forms.HiddenInput()
+        )
+
+        self.fields['membros'] = forms.ModelMultipleChoiceField(
+            queryset=Integrantes.objects.all(),
+            required=False,
+            widget=forms.MultipleHiddenInput()
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Estão na view mas coloquei aqui pra prevenir erros de validação
+        cleaned_data['leader'] = self.request.user.integrantes
+        cleaned_data['membros'] = [self.request.user.integrantes]
+        return cleaned_data
 
 
 class ProjetosForm(forms.ModelForm):

@@ -36,8 +36,15 @@ class Equipes(models.Model):
     leader = models.ForeignKey(Integrantes, on_delete=models.CASCADE, related_name="team_boss")
     membros = models.ManyToManyField(Integrantes)
 
+    def add_member(self, integrante):
+        """Safely add member to team"""
+        self.membros.add(integrante)
+        if not integrante.equipe:
+            integrante.equipe = self
+            integrante.save()
+
     def __str__(self):
-        return f"{self.nome}"
+        return f"{self.name}"
 
 class Projetos(models.Model):
     name = models.CharField(max_length=200, unique=True)

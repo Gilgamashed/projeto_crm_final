@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import logger
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.db.models import Count, Q
@@ -84,33 +85,42 @@ class EquipesCreateView(LoginRequiredMixin, CreateView):
     model = Equipes
     form_class = EquipesForm
     template_name = 'projeto_crm_final/equipes_form.html'
-    success_url = reverse_lazy('dashboard')
+    success_url = reverse_lazy('equipes_list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
 
     def form_valid(self, form):
         try:
-            # pega o criador
-            creator = self.request.user.integrante
-        except AttributeError:
-            messages.error(self.request, "User profile not found. Create a profile first.")
+            integrante = self.request.user.integrantes   #instancia o criador
+            form.instance.leader = integrante   #adiciona criador como lider da equipe
+            team = form.save()                  #salva antes pra não bugar o relacionamento entre models
+            team.membros.add(integrante)        #adiciona criador aos membros
+
+            integrante.role = 'LEAD'            #no perfil no criador, bota seu role como LEAD
+            integrante.equipe = team            #boa sua equipe como a recem criada
+            integrante.save()                   #salva o perfil
+
+            messages.success(self.request, "Equipe criada com sucesso!")
+            return super().form_valid(form)
+
+        except Exception as e:
+            messages.error(self.request, f"Erro ao criar equipe: {str(e)}")
             return self.form_invalid(form)
-        # coloca criador como lider
-        form.instance.leader = creator
-        # salva
-        team = form.save()
-        # update role e equipe
-        creator.role = 'LEAD'
-        creator.equipe = team
-        creator.save()
-        #adiciona criador ao membros da Equipes
-        team.membros.add(creator)
-        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # debugggg
+        logger.error(f"Form invalid: {form.errors}")
+        return super().form_invalid(form)
 
 
 class EquipesUpdateView(LoginRequiredMixin, LeadRequiredMixin, UpdateView):
     model = Equipes
     form_class = EquipesForm
     template_name = 'projeto_crm_final/equipes_form.html'
-    success_url = reverse_lazy('')
+    success_url = reverse_lazy('equipes_list')
 
 
 class EquipesGetView(LoginRequiredMixin, DetailView):

@@ -1,10 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'projeto_crm_final/base.html' %}
+{% load widget_tweaks %}
+{% block title %}Criar Nova Equipe{% endblock %}
 
-</body>
-</html>
+{% block content %}
+<style>
+.form-control-lg {
+  padding: 0.8rem 1rem;
+  font-size: 1.1rem;
+}
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.card-header {
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+}
+</style>
+
+<main class="main-scroll">
+  <div class="container py-5">
+    <!-- erros -->
+    {% if form.errors %}
+    <div class="alert alert-danger">
+      <strong>Erro!</strong> Por favor, corrija os seguintes problemas:
+      <ul>
+        {% for field, errors in form.errors.items %}
+          {% for error in errors %}
+            <li>
+              {% if field != '__all__' %}
+                <strong>{{ field|title }}:</strong>
+              {% endif %}
+              {{ error }}
+            </li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Criar Nova Equipe</h3>
+          </div>
+          
+          <div class="card-body">
+            <form method="post" novalidate>
+              {% csrf_token %}
+              
+              {{ form.leader }}
+              {{ form.membros }}
+              
+              <!-- Nome -->
+              <div class="mb-4">
+                <label for="{{ form.name.id_for_label }}" class="form-label fw-bold">
+                  Nome da Equipe*
+                </label>
+                {% render_field form.name class="form-control form-control-lg" placeholder="Ex: Equipe de Desenvolvimento Web" %}
+                {% if form.name.errors %}
+                  <div class="text-danger mt-2">
+                    {% for error in form.name.errors %}
+                      <span>{{ error }}</span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              
+              <!-- Descrição -->
+              <div class="mb-4">
+                <label for="{{ form.descricao.id_for_label }}" class="form-label fw-bold">
+                  Descrição da Equipe
+                </label>
+                {% render_field form.descricao class="form-control" rows="4" placeholder="Descreva os objetivos e responsabilidades desta equipe..." %}
+                <div class="form-text">
+                  Esta descrição será visível para todos
+                </div>
+              </div>
+
+              <!-- botões -->
+              <div class="d-flex justify-content-between mt-5">
+                <a href="{% url 'equipes_list' %}" class="btn btn-secondary">
+                  <i class="bi bi-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-people-fill"></i> Criar Equipe
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+
+{% endblock %}
