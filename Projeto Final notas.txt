@@ -77,6 +77,7 @@ lista
 	ok    investigar tab cancelado e concluidos
 	ok    criar categorias para projetos
 	ok    filtros por categoria
+	      alterar status do projeto em relaçao ao prazo (atrasado!)
 	      deletar nao deleta mas deixa arquivado e ineditavel?
 	    cobrir com testes
 

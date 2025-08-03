@@ -22,7 +22,8 @@ from django.views.decorators.http import require_POST
 
 from projeto_crm_final.views import SignUpView, HomeView, PassResetView, DashboardView, IntegrantesGetView, \
     UpdateRoleView, IntegrantesListaView, ProjetosCreateView, ProjetosUpdateView, ProjetosView, ProjetosGetView, \
-    ProjetosDeleteView, EquipesView, EquipesCreateView, EquipesUpdateView, EquipesGetView, EquipesDeleteView
+    ProjetosDeleteView, EquipesView, EquipesCreateView, EquipesUpdateView, EquipesGetView, EquipesDeleteView, \
+    assign_project, remove_project
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -41,7 +42,9 @@ urlpatterns = [
     path('equipes/', EquipesView.as_view(), name='equipes_list'),
     path('equipes/novo/', EquipesCreateView.as_view(), name='equipes_create'),
     path('equipes/editar/<int:pk>/', EquipesUpdateView.as_view(), name='equipes_edit'),
-    path("equipes/<int:pk>", EquipesGetView.as_view(), name='equipes_detail'),
+    path("equipes/<int:equipe_id>", EquipesGetView.as_view(), name='equipes_detail'),
+    path('equipes/<int:equipe_id>/projetos/', assign_project, name='equipes_projetos'),
+    path('equipes/<int:equipe_id>/remove_projeto/', remove_project, name='remove_projeto'),
     path('equipes/<int:pk>/excluir/', EquipesDeleteView.as_view(), name='equipes_delete'),
 
     path('projetos/', ProjetosView.as_view() , name='projetos_list'),

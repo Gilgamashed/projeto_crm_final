@@ -1,0 +1,318 @@
+{% extends 'projeto_crm_final/base.html' %}
+{% load static %}
+
+{% block title %}Detalhes da Equipe - {{ equipe.name }}{% endblock %}
+
+{% block content %}
+<style>
+    .team-header {
+        background: linear-gradient(135deg, #2c3e50, #4a6491);
+        color: white;
+        padding: 2rem 0;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .projeto-card {
+        border-left: 4px solid #3498db;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    .projeto-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    .member-card {
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .member-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    .leader-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+    .member-role {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    .btn-assign {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-assign:hover {
+        background: linear-gradient(135deg, #2980b9, #2573a7);
+        transform: translateY(-2px);
+    }
+    .projeto-status {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .status-completed {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    .status-planning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    .projeto-deadline {
+        font-weight: 500;
+        color: #e74c3c;
+    }
+    .section-title {
+        position: relative;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: #3498db;
+        border-radius: 3px;
+    }
+</style>
+
+<main class="container py-4">
+    <!-- Header -->
+    <div class="team-header text-center mb-4">
+        <div class="container">
+            <h1 class="display-4 mb-3">{{ equipe.name }}</h1>
+            <p class="lead mb-4">{{ equipe.descricao }}</p>
+            <div class="d-flex justify-content-center align-items-center">
+                <div class="me-4">
+                    <i class="bi bi-people-fill fs-4 me-2"></i>
+                    <span class="fs-5">{{ equipe.membros.count }} membros</span>
+                </div>
+                <div>
+                    <i class="bi bi-person-badge fs-4 me-2"></i>
+                    <span class="fs-5">Líder: {{ equipe.leader.nome }} {{ equipe.leader.sobrenome }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+    <!-- Projeto -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white d-flex justify-content-between">
+                    <h5 class="mb-0">Projeto Atual</h5>
+                    {% if active_projeto %}
+                        <span class="badge bg-light text-dark">{{ active_projeto.get_status_display }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    {% if active_projeto %}
+                        <h5 class="card-title">{{ active_projeto.name }}</h5>
+                        <p class="card-text">{{ active_projeto.descricao }}</p>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <div>
+                                <span class="fw-bold">Criador:</span>
+                                <span>{{ active_projeto.criador.nome }}</span>
+                            </div>
+                            <div>
+                                <span class="fw-bold">Prazo:</span>
+                                <span class="text-danger">{{ active_projeto.prazofinal|date:"d/m/Y" }}</span>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-clipboard-x text-muted" style="font-size: 3rem;"></i>
+                            <p class="mt-3">Nenhum projeto atribuído</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if active_projeto and user == equipe.leader.user %}
+                <div class="card-footer bg-light">
+                    <form method="post" action="{% url 'remove_projeto' equipe.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="projeto_id" value="{{ active_projeto.id }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-x-circle"></i> Remover Projeto
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- selecionar projeto (pro lider apenas) -->
+            {% if user == equipe.leader.user %}
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Trabalhar em um Novo Projeto</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'equipes_projetos' equipe.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="projetoSelect" class="form-label">Selecione um projeto</label>
+                            <select class="form-select form-select-lg" id="projetoSelect" name="projeto_id">
+                                <option value="">-- Selecione um projeto --</option>
+                                {% for projeto in available_projetos %}
+                                <option value="{{ projeto.id }}">{{ projeto.name }} ({{ projeto.prazofinal|date:"d/m/Y" }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Somente o líder da equipe pode selecionar projetos</small>
+                            <button type="submit" class="btn btn-primary btn-lg px-4">
+                                <i class="bi bi-send-check me-2"></i>Selecionar Projeto
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- cool stats? -->
+        <div class="col-lg-4">
+            <h2 class="section-title">Estatísticas da Equipe</h2>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <i class="bi bi-clipboard-data fs-2 text-primary"></i>
+                        </div>
+                        <h3 class="mb-0">Desempenho</h3>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Projetos Concluídos</span>
+                            <strong>8</strong>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tarefas em Andamento</span>
+                            <strong>12</strong>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Prazo de Entrega</span>
+                            <strong>92%</strong>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 92%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <div class="d-flex justify-content-around">
+                            <div>
+                                <div class="fs-2 fw-bold">15</div>
+                                <div class="text-muted small">Tarefas</div>
+                            </div>
+                            <div>
+                                <div class="fs-2 fw-bold">8</div>
+                                <div class="text-muted small">Projetos</div>
+                            </div>
+                            <div>
+                                <div class="fs-2 fw-bold">96%</div>
+                                <div class="text-muted small">Eficiência</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Membros -->
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="section-title">Membros da Equipe</h2>
+                <div>
+                    <span class="badge bg-primary p-2">Total: {{ equipe.membros.count }} membros</span>
+                </div>
+            </div>
+            
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for member in equipe.membros.all %}
+                <div class="col">
+                    <div class="card member-card h-100">
+                        <div class="card-body">
+                            {% if member == equipe.leader %}
+                            <span class="badge bg-primary leader-badge">Líder</span>
+                            {% endif %}
+                            
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-light border rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                        <i class="bi bi-person fs-1 text-secondary"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="card-title mb-0">{{ member.nome }} {{ member.sobrenome }}</h5>
+                                    <p class="card-text text-muted mb-1">{{ member.cargo }}</p>
+                                    <div class="member-role">
+                                        <i class="bi bi-person-badge me-1"></i>
+                                        <span class="text-uppercase">{{ member.role }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border-top pt-3">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-envelope me-2 text-primary"></i>
+                                            <small>{{ member.user.email }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-telephone me-2 text-success"></i>
+                                            <small>{{ member.telefone|default:"N/A" }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0">
+                            <a href="{% url 'account_user_detail' member.person_id %}" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-person-lines-fill me-2"></i>Ver Perfil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -4,9 +4,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import logger
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models import Count, Q
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, DeleteView, UpdateView
@@ -128,6 +130,77 @@ class EquipesGetView(LoginRequiredMixin, DetailView):
     template_name = "projeto_crm_final/equipes_detail.html"
     context_object_name = "equipe"
     pk_url_kwarg = "equipe_id"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        equipe = self.get_object()
+
+        # Projetos ativos nesta equipe
+        context['active_projeto'] = Projetos.objects.filter(
+            equipe=equipe,
+            status='active'
+        ).first()
+
+        # Projetos disponíveis
+        context['available_projetos'] = Projetos.objects.filter(
+            status='active'
+        ).filter(
+            models.Q(equipe__isnull=True) | models.Q(equipe=equipe)
+        ).exclude(pk=context['active_projeto'].pk if context['active_projeto'] else None)
+
+        return context
+
+@login_required
+def assign_project(request, equipe_id):
+    equipe = get_object_or_404(Equipes, pk=equipe_id)
+
+    # Usuário é lider desta equipe?
+    if request.user != equipe.leader.user:
+        messages.error(request, "Apenas o líder da equipe pode selecionar projetos.")
+        return redirect('equipes_detail', equipe_id=equipe_id)
+
+    if request.method == 'POST':
+        projeto_id = request.POST.get('projeto_id')
+        if projeto_id:
+            projeto = get_object_or_404(Projetos, pk=projeto_id)
+
+            try:
+                existing_active = Projetos.objects.filter(
+                    equipe = equipe,
+                    status = 'active'
+                ).first()
+
+                if existing_active:
+                    existing_active.equipe = None
+                    existing_active.save()
+
+                projeto.equipe = equipe
+                projeto.save()
+                messages.success(request, f"Projeto '{projeto.name}' atribuído à equipe!")
+            except ValidationError as e:
+                messages.error(request, e.message)
+        else:
+            messages.error(request, "Selecione um projeto válido.")
+
+    return redirect('equipes_detail', equipe_id=equipe_id)
+
+@login_required
+def remove_project(request, equipe_id):
+    equipe = get_object_or_404(Equipes, pk=equipe_id)
+
+    if request.user != equipe.leader.user:
+        messages.error(request, "Apenas o líder da equipe pode remover projetos.")
+        return redirect('equipes_detail', equipe_id=equipe_id)
+
+    if request.method == 'POST':
+        projeto_id = request.POST.get('projeto_id')
+        if projeto_id:
+            projeto = get_object_or_404(Projetos, pk=projeto_id)
+            projeto.equipe = None
+            projeto.save()
+            messages.success(request, f"Projeto '{projeto.name}' removido da equipe.")
+
+    return redirect('equipes_detail', equipe_id=equipe_id)
 
 
 class EquipesDeleteView(LoginRequiredMixin, LeadRequiredMixin, DeleteView):

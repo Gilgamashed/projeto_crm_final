@@ -1,6 +1,7 @@
 import uuid
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from .constants import HIERARCH, STATUS, PRIORIDADE, CATEGORIA, STATUSPROJETO
@@ -37,7 +38,7 @@ class Equipes(models.Model):
     membros = models.ManyToManyField(Integrantes)
 
     def add_member(self, integrante):
-        """Safely add member to team"""
+        """metodo para adicionar membros a equipe - testar"""
         self.membros.add(integrante)
         if not integrante.equipe:
             integrante.equipe = self
@@ -58,6 +59,24 @@ class Projetos(models.Model):
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        # Checagem pra ver se o projeto está ativo e relacionado à uma equipe
+        if self.status == 'active' and self.equipe:
+            existing_active = Projetos.objects.filter(
+                equipe=self.equipe,
+                status='active'
+            ).exclude(pk=self.pk).first()
+
+            if existing_active:
+                raise ValidationError(
+                    f"A equipe {self.equipe.name} já tem um projeto ativo: "
+                    f"{existing_active.name}. Remova-o antes de adicionar um novo."
+                )
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
 
 class Tarefas(models.Model):

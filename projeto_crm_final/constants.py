@@ -18,7 +18,6 @@ HIERARCH = [
 ]
 
 CATEGORIA = [
-    ('null', 'Não específico'),
     ('dev', 'dev'),
     ('TI', 'Tecnologia da Informação'),
     ('MK', 'Marketing'),
