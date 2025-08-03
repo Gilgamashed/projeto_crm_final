@@ -1,0 +1,129 @@
+{% extends 'projeto_crm_final/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Editar Perfil{% endblock %}
+
+{% block content %}
+
+<style>
+    .form-control[readonly] {
+        background-color: #f8f9fa;
+        cursor: not-allowed;
+    }
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .card-header {
+        border-top-left-radius: 12px !important;
+        border-top-right-radius: 12px !important;
+    }
+</style>
+
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Editar Perfil</h3>
+                </div>
+                
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Display form errors -->
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Erro!</strong> Por favor, corrija os seguintes problemas:
+                            <ul>
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Nome -->
+                        <div class="mb-4">
+                            <label for="{{ form.nome.id_for_label }}" class="form-label fw-bold">
+                                Nome*
+                            </label>
+                            {% render_field form.nome class="form-control form-control-lg" %}
+                            {% if form.nome.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.nome.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Sobrenome -->
+                        <div class="mb-4">
+                            <label for="{{ form.sobrenome.id_for_label }}" class="form-label fw-bold">
+                                Sobrenome*
+                            </label>
+                            {% render_field form.sobrenome class="form-control form-control-lg" %}
+                            {% if form.sobrenome.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.sobrenome.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Telefone -->
+                        <div class="mb-4">
+                            <label for="{{ form.telefone.id_for_label }}" class="form-label fw-bold">
+                                Telefone
+                            </label>
+                            {% render_field form.telefone class="form-control" %}
+                            {% if form.telefone.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.telefone.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Cargo -->
+                        <div class="mb-4">
+                            <label for="{{ form.cargo.id_for_label }}" class="form-label fw-bold">
+                                Cargo
+                            </label>
+                            {% render_field form.cargo class="form-control" %}
+                            {% if form.cargo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.cargo.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+
+                        
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between mt-5">
+                            <a href="{% url 'account_user_detail' person_id=request.user.integrantes.person_id %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

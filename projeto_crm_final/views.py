@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import logger
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -14,13 +14,15 @@ from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, DeleteView, UpdateView
 
 from projeto_crm_final.constants import HIERARCH, CATEGORIA
-from projeto_crm_final.forms import SignupForm, ProjetosForm, EquipesForm
+from projeto_crm_final.forms import SignupForm, ProjetosForm, EquipesForm, ProfileForm
 from projeto_crm_final.mixins import AdminRequiredMixin, LeadRequiredMixin, ProjetoOwnerMixin
 from projeto_crm_final.models import Integrantes, Projetos, Tarefas, Equipes
 
 
 class HomeView(TemplateView):
     template_name = "projeto_crm_final/home.html"
+
+# ---------- User e autenticação
 
 class SignUpView(CreateView):
     model = User
@@ -32,6 +34,44 @@ class SignUpView(CreateView):
         response = super().form_valid(form)
         login(self.request, self.object)
         return response
+
+
+@login_required
+def edit_profile(request):
+    # Editar profile de usuário
+    profile = request.user.integrantes
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Perfil atualizado com sucesso!")
+            return redirect('home')
+    else:
+        form = ProfileForm(instance=profile)
+
+    return render(request, 'account/user_detail_edit.html', {'form': form})
+
+
+@login_required
+def delete_account(request):
+    if request.method == 'POST':
+        user = request.user
+
+        # o usuario tem q ser deslogado pra evitar bugs
+        logout(request)
+
+        try:
+            # deletar ambos Integrantes e User
+            user.delete()
+            messages.success(request, "Sua conta foi excluída permanentemente.")
+            return redirect('home')
+        except Exception as e:
+            messages.error(request, f"Ocorreu um erro ao excluir sua conta: {str(e)}")
+            return redirect('profile')
+
+    return redirect('profile')
+
 
 class PassResetView(TemplateView):
     template_name = "account/password_reset.html"
@@ -48,6 +88,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['is_admin'] = Integrantes.objects.filter(user=self.request.user).exists() if is_authenticated and usuario.role == 'ADMIN' else False
 
         return context
+
+
+#---Integrantes
 
 class IntegrantesListaView(LoginRequiredMixin, ListView):
     model = Integrantes

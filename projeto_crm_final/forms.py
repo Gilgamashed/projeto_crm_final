@@ -99,8 +99,26 @@ class SignupForm(UserCreationForm):
             "Evite usar informações pessoais."
         )
         self.fields['password2'].help_text = "Repita a senha para verificação."
+#---------------------------------------------------------------------------------------
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Integrantes
+        fields = ['nome', 'sobrenome', 'telefone', 'cargo']
+        labels = {
+            'nome': 'Nome',
+            'sobrenome': 'Sobrenome',
+            'telefone': 'Telefone',
+            'cargo': 'Cargo'
+        }
+        widgets = {
+            'telefone': forms.TextInput(attrs={'placeholder': '(00) 00000-0000'}),
+            'cargo': forms.TextInput(attrs={'placeholder': 'Seu cargo na organização'})
+        }
 
 
+
+# ---------------------------------------------------------------------------------------
 class EquipesForm(forms.ModelForm):
     class Meta:
         model = Equipes

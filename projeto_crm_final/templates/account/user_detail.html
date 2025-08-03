@@ -15,6 +15,7 @@
         <div class="col-md-6">
           <p><strong>Nome:</strong> {{perfil.nome}} {{perfil.sobrenome}}</p>
           <p><strong>Email:</strong> {{perfil.user.email}}</p>
+          <p><strong>Cargo:</strong> {{perfil.cargo}}</p>
         </div>
         <div class="col-md-6">
           <p><strong>Telefone:</strong> {{ perfil.telefone|default:"Não informado" }}</p>
@@ -22,14 +23,21 @@
           <p><strong>ID de Usuário:</strong> {{ perfil.person_id }}</p>
         </div>
       </div>
-      <div class="mt-4">
-        <form method="post" action="{% url 'update_role' %}" class="role-form">
-            {% csrf_token %}
-            <input type="hidden" name="user_id" value="{{ perfil.person_id }}">
-            <button type="submit" name="role" value='ADMIN' class="btn btn-primary {% if perfil.role == 'ADMIN' %}active{% endif %}">
-              Tornar Admin
-            </button>
-        </form>
+      <div class="row">
+        <div class="col-mt-4">
+          <a href="{% url 'account_profile_edit' %}" class="btn btn-primary">
+            Editar Perfil
+          </a>
+        </div>
+        <div class="col-mt-4">
+          <form method="post" action="{% url 'update_role' %}" class="role-form">
+              {% csrf_token %}
+              <input type="hidden" name="user_id" value="{{ perfil.person_id }}">
+              <button type="submit" name="role" value='ADMIN' class="btn btn-primary {% if perfil.role == 'ADMIN' %}active{% endif %}">
+                Tornar Admin
+              </button>
+          </form>
+        </div>
       </div>
       <div class="mt-4">
         <a href="{% url 'dashboard' %}" class="btn btn-primary">
@@ -41,7 +49,77 @@
   </div>
 </div>
 
+  <!-- Deletar conta - Visivel apenas ao dono -->
+  {% if request.user == perfil.user %}
+  <div class="mt-5 border-top pt-4">
+    <h3 class="text-danger mb-3">Zona Perigosa</h3>
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+      <i class="bi bi-trash"></i> Excluir Minha Conta Permanentemente
+    </button>
+    <p class="text-muted mt-2">
+      <small>
+        Esta ação é irreversível. Todos os seus dados serão permanentemente removidos do sistema.
+      </small>
+    </p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal deletar contta -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteAccountModalLabel">Confirmar Exclusão de Conta</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="lead">Tem certeza que deseja excluir sua conta permanentemente?</p>
+
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <strong>Atenção:</strong> Esta ação não pode ser desfeita. Todos os seus dados serão perdidos:
+          <ul class="mt-2">
+            <li>Perfil de usuário</li>
+            <li>Histórico de atividades</li>
+            <li>Associações a equipes</li>
+            <li>Projetos e tarefas atribuídas</li>
+          </ul>
+        </div>
+
+        <p>Para confirmar, digite "<strong>EXCLUIR CONTA</strong>" no campo abaixo:</p>
+        <input type="text" id="confirmationInput" class="form-control" placeholder="Digite EXCLUIR CONTA">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form action="{% url 'account_delete' %}" method="post" id="deleteAccountForm">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+            <i class="bi bi-trash-fill"></i> Confirmar Exclusão
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
+// Validação de confirmação de deletar conta
+document.getElementById('confirmationInput').addEventListener('input', function() {
+  const confirmText = this.value.toUpperCase();
+  const confirmBtn = document.getElementById('confirmDeleteBtn');
+  confirmBtn.disabled = (confirmText !== 'EXCLUIR CONTA');
+});
+
+// Previne enviar o form se o botao estiver desativado
+document.getElementById('deleteAccountForm').addEventListener('submit', function(e) {
+  const confirmBtn = document.getElementById('confirmDeleteBtn');
+  if (confirmBtn.disabled) {
+    e.preventDefault();
+    alert('Por favor, digite "EXCLUIR CONTA" para confirmar.');
+  }
+});
+
 document.querySelectorAll('.role-form').forEach(form => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
