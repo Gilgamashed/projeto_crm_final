@@ -1,6 +1,6 @@
 {% extends 'projeto_crm_final/base.html' %}
 {% load widget_tweaks %}
-{% block title %}Criar Nova Equipe{% endblock %}
+{% block title %}{% if form.instance.pk %}Editar Equipe{% else %}Criar Nova Equipe{% endif %}{% endblock %}
 
 {% block content %}
 <style>
@@ -43,7 +43,13 @@
       <div class="col-lg-8">
         <div class="card shadow-sm">
           <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">Criar Nova Equipe</h3>
+            <h3 class="mb-0">
+              {% if form.instance.pk %}
+                Editar Equipe: {{ form.instance.name }}
+              {% else %}
+                Criar Nova Equipe
+              {% endif %}
+            </h3>
           </div>
           
           <div class="card-body">
@@ -81,11 +87,12 @@
 
               <!-- botões -->
               <div class="d-flex justify-content-between mt-5">
-                <a href="{% url 'equipes_list' %}" class="btn btn-secondary">
-                  <i class="bi bi-arrow-left"></i> Cancelar
+                <a href="{% if form.instance.pk %}{% url 'equipes_detail' form.instance.pk %}{% else %}{% url 'equipes_list' %}{% endif %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Cancelar
                 </a>
                 <button type="submit" class="btn btn-primary">
-                  <i class="bi bi-people-fill"></i> Criar Equipe
+                  <i class="bi bi-people-fill"></i>
+                  {% if form.instance.pk %}Atualizar Equipe{% else %}Criar Equipe{% endif %}
                 </button>
               </div>
             </form>

@@ -9,7 +9,7 @@ from django.db import models
 from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, DeleteView, UpdateView
 
@@ -122,7 +122,33 @@ class EquipesUpdateView(LoginRequiredMixin, LeadRequiredMixin, UpdateView):
     model = Equipes
     form_class = EquipesForm
     template_name = 'projeto_crm_final/equipes_form.html'
-    success_url = reverse_lazy('equipes_list')
+
+    #Uau! reverse NOT lazy
+    def get_success_url(self):
+        return reverse('equipes_detail', kwargs={'equipe_id': self.object.pk})
+
+    def get_form_kwargs(self):
+        """pros queries de membros(??)"""
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    def dispatch(self, request, *args, **kwargs):
+        # permissão para leads e admin
+        equipe = self.get_object()
+        if request.user != equipe.leader.user and request.user.integrantes.role != 'ADMIN':
+            messages.error(request, "Você não tem permissão para editar esta equipe.")
+            return redirect('equipes_detail', equipe_id=equipe.id)
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        """Handle successful form submission"""
+        try:
+            messages.success(self.request, "Equipe atualizada com sucesso!")
+            return super().form_valid(form)
+        except Exception as e:
+            messages.error(self.request, f"Erro ao atualizar equipe: {str(e)}")
+            return self.form_invalid(form)
 
 
 class EquipesGetView(LoginRequiredMixin, DetailView):
@@ -206,7 +232,25 @@ def remove_project(request, equipe_id):
 class EquipesDeleteView(LoginRequiredMixin, LeadRequiredMixin, DeleteView):
     model = Equipes
     template_name = 'projeto_crm_final/equipes_confirm_del.html'
-    success_url = reverse_lazy('')
+    success_url = reverse_lazy('equipes_list')
+
+    def dispatch(self, request, *args, **kwargs):
+        # permissao para lider da equipe e admin
+        equipe = self.get_object()
+        if request.user != equipe.leader.user and request.user.integrantes.role != 'ADMIN':
+            messages.error(request, "Você não tem permissão para excluir esta equipe.")
+            return redirect('equipes_detail', equipe_id=equipe.id)
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        # projetos desta equipe serão liberados
+        Projetos.objects.filter(equipe=self.object).update(equipe=None)
+
+        # membros desta equipe serão liberados
+        Integrantes.objects.filter(equipe=self.object).update(equipe=None)
+
+        messages.success(self.request, f"A equipe '{self.object.name}' foi excluída com sucesso!")
+        return super().form_valid(form)
 
 
 #--------------- PROJETOS

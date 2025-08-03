@@ -188,8 +188,22 @@
             {% endif %}
         </div>
         
-        <!-- cool stats? -->
+        <!-- delete and edit -->
         <div class="col-lg-4">
+            <!-- Edit and Delete Buttons -->
+            {% if user == equipe.leader.user or user.integrantes.role == 'ADMIN' %}
+            <div class="d-grid gap-2 mb-4">
+                <a href="{% url 'equipes_edit' equipe.id %}" class="btn btn-warning btn-lg">
+                    <i class="bi bi-pencil-square me-2"></i> Editar Equipe
+                </a>
+
+                <!-- Modal de confirmação -->
+                <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="bi bi-trash me-2"></i> Excluir Equipe
+                </button>
+            </div>
+            {% endif %}
+            <!-- cool stats? -->
             <h2 class="section-title">Estatísticas da Equipe</h2>
             <div class="card mb-4">
                 <div class="card-body">
@@ -315,4 +329,36 @@
         </div>
     </div>
 </main>
+
+
+<!-- modal de confirmar exclusao da equipe -->
+{% if user == equipe.leader.user or user.integrantes.role == 'ADMIN' %}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="lead">Tem certeza que deseja excluir a equipe <strong>{{ equipe.name }}</strong>?</p>
+                <p class="text-danger">
+                    <i class="bi bi-exclamation-triangle"></i> Esta ação é irreversível e removerá todos os membros da equipe.
+                </p>
+                <p>
+                    Projetos atualmente atribuídos a esta equipe serão liberados para outras equipes.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form action="{% url 'equipes_delete' equipe.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}
