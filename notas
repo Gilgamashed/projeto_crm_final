@@ -10,10 +10,10 @@ Criar uma aplicação web para gestão de times e atribuição de tarefas, funci
 O sistema permitirá criar times, registrar usuários e atribuir tarefas com datas e prioridades. Ideal para simular o ambiente de gerenciamento de projetos em equipe com foco em produtividade.
 
 ✅ Funcionalidades Requeridas (MVP):
-CRUD de times com nome e descrição.
-CRUD de usuários com nome, e-mail e cargo.
-CRUD de tarefas, vinculadas a um time e a um usuário, com título, descrição, status, prazo e prioridade.
-Visualização das tarefas por usuário.
+ok  CRUD de times com nome e descrição.
+ok  CRUD de usuários com nome, e-mail e cargo.
+ok  CRUD de tarefas, vinculadas a um time e a um usuário, com título, descrição, status, prazo e prioridade.
+ok  Visualização das tarefas por usuário.
 Filtro de tarefas por status ou prioridade.
 Sistema de autenticação.
 Envio de e-mail de notificação ao atribuir uma tarefa.

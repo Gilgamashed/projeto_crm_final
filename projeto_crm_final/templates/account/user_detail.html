@@ -41,6 +41,51 @@
               </button>
           </form>
         </div>
+        <div class="row mt-4">
+          <div class="col-md-12">
+            <h4 class="border-bottom pb-2">Equipe e Projetos</h4>
+
+            <!-- Informação da Equipe -->
+            <div class="d-flex align-items-center mb-3">
+              <i class="bi bi-people fs-4 text-primary me-3"></i>
+              <div>
+                <strong>Equipe:</strong>
+                {% if perfil.equipe %}
+                  <a href="{% url 'equipes_detail' perfil.equipe.id %}" class="ms-2">
+                    {{ perfil.equipe.name }}
+                  </a>
+                  {% if perfil.equipe.leader == perfil %}
+                    <span class="badge bg-primary ms-2">Líder</span>
+                  {% endif %}
+                {% else %}
+                  <span class="text-muted ms-2">Nenhuma equipe atribuída</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Projeto ativo na equipe -->
+            {% if active_project %}
+            <div class="d-flex align-items-start">
+              <i class="bi bi-kanban fs-4 text-info me-3"></i>
+              <div>
+                <strong>Projeto Ativo:</strong>
+                <a href="{% url 'projetos_detail' active_project.id %}" class="ms-2">
+                  {{ active_project.name }}
+                </a>
+                <div class="mt-2">
+                  <span class="badge {% if active_project.status == 'active' %}bg-success{% elif active_project.status == 'completed' %}bg-danger{% else %}bg-warning{% endif %}">
+                    {{ active_project.get_status_display }}
+                  </span>
+                  <span class="ms-2">
+                    <i class="bi bi-calendar-check"></i>
+                    Prazo: {{ active_project.prazofinal|date:"d/m/Y" }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
       </div>
       <div class="mt-4">
         <a href="{% url 'dashboard' %}" class="btn btn-primary">

@@ -24,7 +24,7 @@
       </div>
     </div>
 
-    <!-- Categoria e Deadline-->
+    <!-- Categoria, priodidade e Deadline-->
     <div class="row">
       <div class="col-md-6 mb-3">
         <label class="form-label">{{ form.categoria.label }}</label>
@@ -32,6 +32,18 @@
         {% if form.categoria.errors %}
           <div class="invalid-feedback d-block">
             {% for error in form.categoria.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">{{ form.prioridade.label }}</label>
+        {{ form.prioridade|add_class:"form-control" }}
+        {% if form.prioridade.errors %}
+          <div class="invalid-feedback d-block">
+            {% for error in form.prioridade.errors %}
               {{ error }}
             {% endfor %}
           </div>

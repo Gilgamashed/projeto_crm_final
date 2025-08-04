@@ -7,13 +7,13 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Q
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseForbidden, request
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, DeleteView, UpdateView
 
-from projeto_crm_final.constants import HIERARCH, CATEGORIA
+from projeto_crm_final.constants import HIERARCH, CATEGORIA, PRIORIDADE
 from projeto_crm_final.forms import SignupForm, ProjetosForm, EquipesForm, ProfileForm, CredentialsForm
 from projeto_crm_final.mixins import AdminRequiredMixin, LeadRequiredMixin, ProjetoOwnerMixin
 from projeto_crm_final.models import Integrantes, Projetos, Tarefas, Equipes
@@ -151,6 +151,20 @@ class IntegrantesGetView(LoginRequiredMixin, DetailView):
     context_object_name = "perfil"
     pk_url_kwarg = "person_id"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        perfil = self.get_object()
+
+        if perfil.equipe:
+            context['active_project'] = Projetos.objects.filter(
+                equipe=perfil.equipe,
+                status='active'
+            ).first()
+        else:
+            context['active_project'] = None
+
+        return context
+
 class UpdateRoleView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         new_role = "ADMIN"
@@ -171,6 +185,20 @@ class EquipesView(LoginRequiredMixin, ListView):
     model = Equipes
     template_name = 'projeto_crm_final/equipes_list.html'
     context_object_name = 'equipes'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        equipes = Equipes.objects.all()
+
+        # pega o time do usuario atual
+        user_team = None
+        if self.request.user.is_authenticated and hasattr(self.request.user, 'integrantes'):
+            user_team = self.request.user.integrantes.equipe
+
+        context['equipes'] = equipes
+        context['user_team'] = user_team
+
+        return context
 
 
 class EquipesCreateView(LoginRequiredMixin, CreateView):
@@ -381,12 +409,15 @@ class ProjetosView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         status = self.request.GET.get('status')
         categoria = self.request.GET.get('categoria')
+        prioridade = self.request.GET.get('prioridade')
         queryset = Projetos.objects.all()
 
         if status:
             queryset = queryset.filter(status=status)
         if categoria:
             queryset = queryset.filter(categoria=categoria)
+        if prioridade:
+            queryset = queryset.filter(prioridade=prioridade)
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -401,9 +432,11 @@ class ProjetosView(LoginRequiredMixin, ListView):
                 pass
 
         context['categorias'] = CATEGORIA
+        context['prioridades'] = PRIORIDADE
 
         context['current_status'] = self.request.GET.get('status', '')
         context['current_categoria'] = self.request.GET.get('categoria', '')
+        context['current_prioridade'] = self.request.GET.get('prioridade','')
 
         return context
 
