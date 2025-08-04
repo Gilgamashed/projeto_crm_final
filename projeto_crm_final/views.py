@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Q
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views import View
@@ -264,6 +264,14 @@ class EquipesGetView(LoginRequiredMixin, DetailView):
             models.Q(equipe__isnull=True) | models.Q(equipe=equipe)
         ).exclude(pk=context['active_projeto'].pk if context['active_projeto'] else None)
 
+        #membros disponíveis para entrar na eequipe
+        current_members_ids = equipe.membros.all().values_list('person_id', flat=True)
+        context['available_integrantes'] = Integrantes.objects.exclude(
+            person_id__in=current_members_ids
+        ).filter(
+            models.Q(equipe__isnull=True) | models.Q(equipe=equipe)
+        ).distinct()
+
         return context
 
 @login_required
@@ -318,6 +326,25 @@ def remove_project(request, equipe_id):
 
     return redirect('equipes_detail', equipe_id=equipe_id)
 
+    return render(request, 'equipes_detail.html', context)
+
+def equipes_invite(request, equipe_id):
+    equipe = get_object_or_404(Equipes, id=equipe_id)
+
+    if request.method == 'POST':
+        integrante_id = request.POST.get('integrante_id')
+
+        if not (request.user == equipe.leader.user or request.user.integrantes.role == 'ADMIN'):
+            return HttpResponseForbidden("Permissão negada")
+
+        try:
+            integrante = Integrantes.objects.get(person_id=integrante_id)
+            equipe.add_member(integrante)
+            messages.success(request, f"{integrante.nome} foi adicionado à equipe!")
+        except Integrantes.DoesNotExist:
+            messages.error(request, "Integrante não encontrado")
+
+    return redirect('equipes_detail', equipe_id=equipe_id)
 
 class EquipesDeleteView(LoginRequiredMixin, LeadRequiredMixin, DeleteView):
     model = Equipes

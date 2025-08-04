@@ -44,6 +44,15 @@ class Equipes(models.Model):
             integrante.equipe = self
             integrante.save()
 
+    def remove_member(self, integrante):
+        """Remove um membro da equipe"""
+        if integrante in self.membros.all():
+            self.membros.remove(integrante)
+            if integrante.equipe == self:
+                integrante.equipe = None
+                integrante.save()
+        return True
+
     def __str__(self):
         return f"{self.name}"
 

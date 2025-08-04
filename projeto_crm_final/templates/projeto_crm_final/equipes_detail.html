@@ -186,7 +186,39 @@
                 </div>
             </div>
             {% endif %}
+
+            {% if user == equipe.leader.user or user.integrantes.role == 'ADMIN' %}
+            <div class="card border-success mb-4">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Convidar Membros para a Equipe</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'equipes_invite' equipe.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="integranteSelect" class="form-label">Selecione um integrante</label>
+                            <select class="form-select form-select-lg" id="integranteSelect" name="integrante_id">
+                                <option value="">-- Selecione um integrante --</option>
+                                {% for integrante in available_integrantes %}
+                                <option value="{{ integrante.person_id }}">
+                                    {{ integrante.nome }} {{ integrante.sobrenome }} ({{ integrante.cargo }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Somente o líder ou administradores podem convidar membros</small>
+                            <button type="submit" class="btn btn-success btn-lg px-4">
+                                <i class="bi bi-send-plus me-2"></i>Enviar Convite
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
         </div>
+
+
         
         <!-- delete and edit -->
         <div class="col-lg-4">
