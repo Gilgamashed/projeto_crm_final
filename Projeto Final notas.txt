@@ -83,13 +83,14 @@ lista
 
 
 	Management de equipe
-	    perfil de usuario - mais info cargo por exemplo
+	ok    perfil de usuario - mais info cargo por exemplo
 	    perfil pode ser visto por outros? sistema de menssagens interno?
-	    CRUD de equipes
-	    perfil de grupo
+	ok    CRUD de equipes
+	ok    perfil de grupo
 	    lider pode criar tarefas dentro do projeto
 	    enviar relatorio de conclusao dee tarefas?
-	    sistema de convite
+	ok    sistema de convite
+	    cobrir com testes
 
 	Fazer o log
 

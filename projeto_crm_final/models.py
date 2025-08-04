@@ -61,8 +61,9 @@ class Projetos(models.Model):
     descricao = models.TextField(max_length=300, blank=True)
     criador = models.ForeignKey(Integrantes, on_delete=models.CASCADE)
     equipe = models.ForeignKey(Equipes, on_delete=models.SET_NULL, null=True)
-    categoria = models.CharField(max_length=100, choices=CATEGORIA, default='null')
+    categoria = models.CharField(max_length=100, choices=CATEGORIA, default='dev')
     inicio = models.DateTimeField(auto_now_add=True)
+    prioridade = models.CharField(max_length=20, choices=PRIORIDADE, default='regular')
     status = models.CharField(max_length=20, choices=STATUSPROJETO, default='active')
     prazofinal = models.DateField()
 

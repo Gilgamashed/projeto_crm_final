@@ -180,10 +180,11 @@ class EquipesForm(forms.ModelForm):
 class ProjetosForm(forms.ModelForm):
     class Meta:
         model = Projetos
-        fields = ['name', 'descricao', 'categoria', 'prazofinal',]
+        fields = ['name', 'descricao', 'categoria', 'prioridade', 'prazofinal',]
         widgets = {'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Nome do projeto'}),
                    'descricao': forms.Textarea(attrs={'class': 'form-control'}),
                    'categoria': forms.Select(attrs={'class': 'form-control'}),
+                   'prioridade': forms.Select(attrs={'class': 'form-control'}),
                    'prazofinal': forms.DateInput(attrs={
                        'class':'form-control',
                        'type':'date',
@@ -192,6 +193,7 @@ class ProjetosForm(forms.ModelForm):
         labels = {'name' : 'Nome do projeto*',
                   'descricao' : 'Descrição do projeto',
                   'categoria' : 'Categoria',
+                  'prioridade' : 'Prioridade*',
                   'prazofinal' : 'Prazo Final*'}
 
     def clean_name(self):
