@@ -1,7 +1,7 @@
 from django.contrib import messages
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import logger
+from django.contrib.auth.forms import logger, PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -14,7 +14,7 @@ from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, DeleteView, UpdateView
 
 from projeto_crm_final.constants import HIERARCH, CATEGORIA
-from projeto_crm_final.forms import SignupForm, ProjetosForm, EquipesForm, ProfileForm
+from projeto_crm_final.forms import SignupForm, ProjetosForm, EquipesForm, ProfileForm, CredentialsForm
 from projeto_crm_final.mixins import AdminRequiredMixin, LeadRequiredMixin, ProjetoOwnerMixin
 from projeto_crm_final.models import Integrantes, Projetos, Tarefas, Equipes
 
@@ -71,6 +71,53 @@ def delete_account(request):
             return redirect('profile')
 
     return redirect('profile')
+
+
+@login_required
+def edit_account_info(request):
+    user = request.user
+
+    if request.method == 'POST':
+        form = CredentialsForm(request.POST, instance=user)
+        if form.is_valid():
+            # Mudando username?
+            new_username = form.cleaned_data['username']
+            if new_username != user.username:
+                # Está disponível?
+                if User.objects.filter(username=new_username).exclude(pk=user.pk).exists():
+                    messages.error(request, "Este nome de usuário já está em uso.")
+                    return render(request, 'account/user_login_edit.html', {'form': form})
+
+            #Salva
+            form.save()
+            messages.success(request, "Informações da conta atualizadas com sucesso!")
+            return redirect('home')
+    else:
+        form = CredentialsForm(instance=user)
+
+    return render(request, 'account/user_login_edit.html', {
+        'form': form,
+        'password_form': PasswordChangeForm(user)
+    })
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)       #form do Django
+        if form.is_valid():
+            user = form.save()
+            # Previne logout
+            update_session_auth_hash(request, user)
+            messages.success(request, "Sua senha foi alterada com sucesso!")
+            return redirect('account_login_info_edit')
+        else:
+            # Se houver erros, mostra a página com erros
+            messages.error(request, "Por favor, corrija os erros abaixo.")
+            return render(request, 'account/user_login_edit.html', {
+                'form': CredentialsForm(instance=request.user),
+                'password_form': form
+            })
+    return redirect('account_info_edit')
 
 
 class PassResetView(TemplateView):

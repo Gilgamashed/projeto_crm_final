@@ -23,7 +23,7 @@ from django.views.decorators.http import require_POST
 from projeto_crm_final.views import SignUpView, HomeView, PassResetView, DashboardView, IntegrantesGetView, \
     UpdateRoleView, IntegrantesListaView, ProjetosCreateView, ProjetosUpdateView, ProjetosView, ProjetosGetView, \
     ProjetosDeleteView, EquipesView, EquipesCreateView, EquipesUpdateView, EquipesGetView, EquipesDeleteView, \
-    assign_project, remove_project, edit_profile, delete_account
+    assign_project, remove_project, edit_profile, delete_account, edit_account_info, change_password
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -34,6 +34,8 @@ urlpatterns = [
     path('account/logout/', require_POST(LogoutView.as_view(next_page='home')), name='account_logout'),
     path("account/profile/<uuid:person_id>/", IntegrantesGetView.as_view(), name='account_user_detail'),
     path('account/profile/edit', edit_profile, name='account_profile_edit'),
+    path('account/credentials/edit/', edit_account_info, name='account_login_info_edit'),
+    path('account/password_change/', change_password, name='change_password'),
     path('update_role/', UpdateRoleView.as_view(), name='update_role'),
     path('account/signup/', SignUpView.as_view(), name='account_signup'),
     path('account/excluir/', delete_account, name='account_delete'),

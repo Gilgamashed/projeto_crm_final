@@ -1,0 +1,194 @@
+{% extends 'projeto_crm_final/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Editar Informações da Login{% endblock %}
+
+{% block content %}
+
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .card-header {
+        border-top-left-radius: 12px !important;
+        border-top-right-radius: 12px !important;
+    }
+    .form-control-lg {
+        padding: 0.8rem 1rem;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Editar Informações de login</h3>
+                </div>
+                
+                <div class="card-body">
+                    <form method="post" action="{% url 'account_login_info_edit' %}">
+                        {% csrf_token %}
+                        
+                        <!-- Form -->
+                        <div class="mb-5">
+                            <h4 class="border-bottom pb-2 mb-4">Informações de login</h4>
+                            
+                            {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <strong>Erro!</strong> Por favor, corrija os seguintes problemas:
+                                <ul>
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Username -->
+                            <div class="mb-4">
+                                <label for="{{ form.username.id_for_label }}" class="form-label fw-bold">
+                                    Nome de Usuário*
+                                </label>
+                                {% render_field form.username class="form-control form-control-lg" %}
+                                {% if form.username.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.username.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">{{ form.username.help_text }}</small>
+                            </div>
+                            
+                            <!-- Email -->
+                            <div class="mb-4">
+                                <label for="{{ form.email.id_for_label }}" class="form-label fw-bold">
+                                    Endereço de Email*
+                                </label>
+                                {% render_field form.email class="form-control form-control-lg" %}
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.email.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">{{ form.email.help_text }}</small>
+                            </div>
+                            
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save"></i> Atualizar Informações
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <!-- Password -->
+                    <div class="mt-5 pt-4 border-top">
+                        <h4 class="border-bottom pb-2 mb-4">Alterar Senha</h4>
+                        
+                        <form method="post" action="{% url 'change_password' %}">
+                            {% csrf_token %}
+                            
+                            {% if password_form.errors %}
+                            <div class="alert alert-danger">
+                                <strong>Erro na senha!</strong> Por favor, corrija os seguintes problemas:
+                                <ul>
+                                    {% for field, errors in password_form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Password atual -->
+                            <div class="mb-4">
+                                <label for="{{ password_form.old_password.id_for_label }}" class="form-label fw-bold">
+                                    Senha Atual*
+                                </label>
+                                {% render_field password_form.old_password class="form-control" %}
+                                {% if password_form.old_password.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in password_form.old_password.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="row">
+                                <!-- Nova password -->
+                                <div class="col-md-6 mb-4">
+                                    <label for="{{ password_form.new_password1.id_for_label }}" class="form-label fw-bold">
+                                        Nova Senha*
+                                    </label>
+                                    {% render_field password_form.new_password1 class="form-control" %}
+                                    {% if password_form.new_password1.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in password_form.new_password1.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Confirmar Password -->
+                                <div class="col-md-6 mb-4">
+                                    <label for="{{ password_form.new_password2.id_for_label }}" class="form-label fw-bold">
+                                        Confirmar Nova Senha*
+                                    </label>
+                                    {% render_field password_form.new_password2 class="form-control" %}
+                                    {% if password_form.new_password2.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in password_form.new_password2.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- requisitos de Password? -->
+                            <div class="alert alert-info">
+                                <h5 class="alert-heading">Requisitos de Segurança</h5>
+                                <ul class="mb-0">
+                                    <li>Sua senha não pode ser muito similar às suas outras informações pessoais</li>
+                                    <li>Sua senha precisa conter pelo menos 8 caracteres</li>
+                                    <li>Sua senha não pode ser uma senha comumente usada</li>
+                                    <li>Sua senha não pode ser inteiramente numérica</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-key"></i> Alterar Senha
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- botoes de navegação -->
+                    <div class="d-flex justify-content-between mt-5 border-top pt-4">
+                        <a href="{% url 'account_user_detail' person_id=request.user.integrantes.person_id %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Voltar ao Perfil
+                        </a>
+                        <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-house"></i> Ir para Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

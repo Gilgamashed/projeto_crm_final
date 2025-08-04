@@ -28,6 +28,9 @@
           <a href="{% url 'account_profile_edit' %}" class="btn btn-primary">
             Editar Perfil
           </a>
+          <a href="{% url 'account_login_info_edit' %}" class="btn btn-outline-primary">
+              <i class="bi bi-gear"></i> Editar Informações da Conta
+          </a>
         </div>
         <div class="col-mt-4">
           <form method="post" action="{% url 'update_role' %}" class="role-form">

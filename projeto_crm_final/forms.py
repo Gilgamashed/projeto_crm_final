@@ -117,6 +117,23 @@ class ProfileForm(forms.ModelForm):
         }
 
 
+class CredentialsForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+        labels = {
+            'username': 'Nome de Usuário',
+            'email': 'Endereço de Email'
+        }
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].help_text = "Seu identificador único no sistema"
+        self.fields['email'].help_text = "Endereço para notificações e recuperação de senha"
 
 # ---------------------------------------------------------------------------------------
 class EquipesForm(forms.ModelForm):
