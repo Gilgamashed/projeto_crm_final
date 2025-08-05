@@ -1,5 +1,6 @@
 {% extends 'projeto_crm_final/base.html' %}
 {% load widget_tweaks %}
+{% load template_filters %}
 {% block title %}Projetos{% endblock %}
 
 {% block content %}
@@ -29,76 +30,74 @@
       <!-- Status do projeto -->
       <ul class="nav nav-tabs">
         <li class="nav-item">
-          <a class="nav-link {% if not request.GET.status %}active{% endif %}"
-             href="?">Todos</a>
+          <a class="nav-link {% if not current_status %}active{% endif %}"
+             href="?{% build_query prioridade=current_prioridade categoria=current_categoria %}">Todos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.GET.status == 'active' %}active{% endif %}"
-             href="?status=active">Ativos</a>
+          <a class="nav-link {% if current_status == 'active' %}active{% endif %}"
+             href="?{% build_query status='active' prioridade=current_prioridade categoria=current_categoria %}">Ativos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.GET.status == 'canceled' %}active{% endif %}"
-             href="?status=canceled">Cancelado</a>
+          <a class="nav-link {% if current_status == 'canceled' %}active{% endif %}"
+             href="?{% build_query status='canceled' prioridade=current_prioridade categoria=current_categoria %}">Cancelado</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.GET.status == 'overdue' %}active{% endif %}"
-             href="?status=overdue">Atrasados</a>
+          <a class="nav-link {% if current_status == 'overdue' %}active{% endif %}"
+             href="?{% build_query status='overdue' prioridade=current_prioridade categoria=current_categoria %}">Atrasados</a>
         </li>
-              <li class="nav-item">
-          <a class="nav-link {% if request.GET.status == 'done' %}active{% endif %}"
-             href="?status=done">Concluídos</a>
+        <li class="nav-item">
+          <a class="nav-link {% if current_status == 'done' %}active{% endif %}"
+             href="?{% build_query status='done' prioridade=current_prioridade categoria=current_categoria %}">Concluídos</a>
         </li>
       </ul>
 
       <!-- filtro de prioridade -->
-        <div class="dropdown">
-    <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-            id="priorityFilter" data-bs-toggle="dropdown" aria-expanded="false">
-      {% if current_prioridade %}
-        {% for key, value in prioridades %}
-          {% if key == current_prioridade %}{{ value }}{% endif %}
-        {% endfor %}
-      {% else %}
-        Prioridades
-      {% endif %}
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="priorityFilter">
-      <li><a class="dropdown-item" href="?{% if current_status %}status={{ current_status }}{% if current_categoria %}&categoria={{ current_categoria }}{% endif %}{% endif %}">
-        Todas Prioridades
-      </a></li>
-      <li><hr class="dropdown-divider"></li>
-      {% for key, value in prioridades %}
-        <li>
-          <a class="dropdown-item"
-             href="?{% if current_status %}status={{ current_status }}&{% endif %}{% if current_categoria %}categoria={{ current_categoria }}&{% endif %}prioridade={{ key }}">
-            {{ value }}
-          </a>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
+      <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                id="priorityFilter" data-bs-toggle="dropdown" aria-expanded="false">
+          {% if current_prioridade %}
+            {{ current_prioridade_display }}
+          {% else %}
+            Prioridades
+          {% endif %}
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="priorityFilter">
+          <li><a class="dropdown-item"
+                 href="?{% build_query status=current_status categoria=current_categoria %}">
+            Todas Prioridades
+          </a></li>
+          <li><hr class="dropdown-divider"></li>
+          {% for key, value in prioridades %}
+            <li>
+              <a class="dropdown-item"
+                 href="?{% build_query status=current_status prioridade=key categoria=current_categoria %}">
+                {{ value }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
 
       <!-- Categoria do projeto -->
       <div class="dropdown">
         <button class="btn btn-outline-secondary dropdown-toggle" type="button"
                 id="categoryFilter" data-bs-toggle="dropdown" aria-expanded="false">
           {% if current_categoria %}
-            {% for key, value in categorias %}
-              {% if key == current_categoria %}{{ value }}{% endif %}
-            {% endfor %}
+            {{ current_categoria_display }}
           {% else %}
             Categorias
           {% endif %}
         </button>
         <ul class="dropdown-menu" aria-labelledby="categoryFilter">
-          <li><a class="dropdown-item" href="?{% if current_status %}status={{ current_status }}{% endif %}">
-            Categorias
+          <li><a class="dropdown-item"
+                 href="?{% build_query status=current_status prioridade=current_prioridade %}">
+            Todas Categorias
           </a></li>
           <li><hr class="dropdown-divider"></li>
           {% for key, value in categorias %}
             <li>
               <a class="dropdown-item"
-                 href="?{% if current_status %}status={{ current_status }}&{% endif %}categoria={{ key }}">
+                 href="?{% build_query status=current_status prioridade=current_prioridade categoria=key %}">
                 {{ value }}
               </a>
             </li>
@@ -188,7 +187,8 @@
       <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+            <a class="page-link"
+               href="?{% build_query page=page_obj.previous_page_number status=current_status prioridade=current_prioridade categoria=current_categoria %}">&laquo;</a>
           </li>
         {% endif %}
 
@@ -199,14 +199,16 @@
             </li>
           {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
             <li class="page-item">
-              <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+              <a class="page-link"
+                 href="?{% build_query page=num status=current_status prioridade=current_prioridade categoria=current_categoria %}">{{ num }}</a>
             </li>
           {% endif %}
         {% endfor %}
 
         {% if page_obj.has_next %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+            <a class="page-link"
+               href="?{% build_query page=page_obj.next_page_number status=current_status prioridade=current_prioridade categoria=current_categoria %}">&raquo;</a>
           </li>
         {% endif %}
       </ul>
@@ -214,6 +216,12 @@
     {% endif %}
   </div>
 </main>
+
+<!-- filtros -->
+{% if not 'build_query' in registered_filters %}
+    {# Cria a tag template se não existir #}
+    {% load template_filters %}
+{% endif %}
 
 <style>
 /* Status colors */

@@ -10,6 +10,7 @@ from django.db.models import Count, Q
 from django.http import JsonResponse, HttpResponseForbidden, request
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
+from django.utils import timezone
 from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, DeleteView, UpdateView
 
@@ -412,13 +413,26 @@ class ProjetosView(LoginRequiredMixin, ListView):
         prioridade = self.request.GET.get('prioridade')
         queryset = Projetos.objects.all()
 
-        if status:
-            queryset = queryset.filter(status=status)
+        #filtro de status
+        hoje = timezone.now().date()
+        if status == 'active':
+            queryset = queryset.filter(status='active')
+        elif status == 'canceled':
+            queryset = queryset.filter(status='canceled')
+        elif status == 'overdue':
+            queryset = queryset.filter(
+                status='active',
+                prazofinal__lt=hoje
+            )
+        elif status == 'done':
+            queryset = queryset.filter(status='done')
+
+        #Filtros adicionais (acumulativos)
         if categoria:
             queryset = queryset.filter(categoria=categoria)
         if prioridade:
             queryset = queryset.filter(prioridade=prioridade)
-        return queryset
+        return queryset.order_by('-inicio')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -434,11 +448,26 @@ class ProjetosView(LoginRequiredMixin, ListView):
         context['categorias'] = CATEGORIA
         context['prioridades'] = PRIORIDADE
 
+        current_status = self.request.GET.get('status', '')
+        current_categoria = self.request.GET.get('categoria', '')
+        current_prioridade = self.request.GET.get('prioridade', '')
+
         context['current_status'] = self.request.GET.get('status', '')
         context['current_categoria'] = self.request.GET.get('categoria', '')
         context['current_prioridade'] = self.request.GET.get('prioridade','')
 
+        # Display pros filtros
+        context['current_categoria_display'] = self.get_display_value(CATEGORIA, current_categoria)
+        context['current_prioridade_display'] = self.get_display_value(PRIORIDADE, current_prioridade)
+
         return context
+
+    def get_display_value(self, choices, value):
+        """valor de display pros filtros"""
+        for key, display in choices:
+            if key == value:
+                return display
+        return ''
 
 class ProjetosCreateView(LoginRequiredMixin, LeadRequiredMixin, CreateView):
     model = Projetos
