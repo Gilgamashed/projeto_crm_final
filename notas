@@ -14,8 +14,8 @@ ok  CRUD de times com nome e descrição.
 ok  CRUD de usuários com nome, e-mail e cargo.
 ok  CRUD de tarefas, vinculadas a um time e a um usuário, com título, descrição, status, prazo e prioridade.
 ok  Visualização das tarefas por usuário.
-Filtro de tarefas por status ou prioridade.
-Sistema de autenticação.
+ok  Filtro de tarefas por status ou prioridade.
+ok? Sistema de autenticação.
 Envio de e-mail de notificação ao atribuir uma tarefa.
 Deploy no Render.
 

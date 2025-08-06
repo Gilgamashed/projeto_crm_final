@@ -89,6 +89,17 @@ class Projetos(models.Model):
         super().save(*args, **kwargs)
 
 
+class RelatorioProjeto(models.Model):
+    projeto = models.ForeignKey(Projetos, on_delete=models.CASCADE)
+    arquivo = models.FileField(upload_to='relatorios/')
+    enviado_por = models.ForeignKey(Integrantes, on_delete=models.CASCADE)
+    enviado_em = models.DateTimeField(auto_now_add=True)
+    cloudinary_url = models.URLField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Relatório para {self.projeto.name}"
+
+
 class Tarefas(models.Model):
     tarefa = models.CharField(max_length=200)
     descricao = models.TextField()

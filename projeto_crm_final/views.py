@@ -1,3 +1,7 @@
+import mimetypes
+
+import cloudinary
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -5,6 +9,7 @@ from django.contrib.auth.forms import logger, PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.core.mail import EmailMessage
 from django.db import models
 from django.db.models import Count, Q
 from django.http import JsonResponse, HttpResponseForbidden, request
@@ -15,7 +20,7 @@ from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, DeleteView, UpdateView
 
 from projeto_crm_final.constants import HIERARCH, CATEGORIA, PRIORIDADE
-from projeto_crm_final.forms import SignupForm, ProjetosForm, EquipesForm, ProfileForm, CredentialsForm
+from projeto_crm_final.forms import SignupForm, ProjetosForm, EquipesForm, ProfileForm, CredentialsForm, RelatorioForm
 from projeto_crm_final.mixins import AdminRequiredMixin, LeadRequiredMixin, ProjetoOwnerMixin
 from projeto_crm_final.models import Integrantes, Projetos, Tarefas, Equipes
 
@@ -302,6 +307,72 @@ class EquipesGetView(LoginRequiredMixin, DetailView):
         ).distinct()
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        equipe = self.get_object()
+        active_projeto = equipe.projetos_set.filter(status='active').first()
+
+        if not active_projeto:
+            messages.error(request,"Nenhum projeto ativo sendo trabalhado por essa equipe")
+            return redirect('equipes_detail', equipe_id=equipe.id)
+
+        form = RelatorioForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            # Salva o relatório
+            relatorio = form.save(commit=False)
+            relatorio.projeto = active_projeto
+            relatorio.enviado_por = request.user.integrantes
+            relatorio.save()
+
+            #Upload pro Cloudinary
+            file = relatorio.arquivo
+            date_prefix = timezone.now().strftime('%Y_%m_%d')
+            filename = f'{date_prefix}_relatorio_{active_projeto.name}'
+
+            upload_result = cloudinary.uploader.upload(
+                file=file,
+                asset_folder='relatorios',
+                public_id=filename,
+                override=True,
+                resource_type="raw"
+            )
+
+            # Atualiza status do Projeto e da equipe
+            active_projeto.status = 'done'
+            active_projeto.save()
+
+            # Email de todos do time
+            team_members = active_projeto.equipe.membros.all()
+            emails = [membro.user.email for membro in team_members]
+
+            # Prepara e manda o e-mail
+            subject = f'Projeto {active_projeto.name} Concluído'
+            message = f'''
+            Parabéns à equipe {equipe.name}!
+            O projeto "{active_projeto.name}" foi concluído pelo líder da equipe.
+            
+            Descrição do projeto:
+            {active_projeto.descricao}
+
+            Relatório disponível em: {upload_result['secure_url']}
+            '''
+
+            email = EmailMessage(
+                subject,
+                message,
+                request.user.email,  # do usuario atual
+                emails,  # pra todos os membros da equipe
+                [settings.EMAIL_HOST_USER],  # BCC pro system
+            )
+            email.send()
+
+            messages.success(request, 'Projeto concluído com sucesso e relatório enviado!')
+            return redirect('equipes_detail', equipe_id=equipe.id)
+
+        context = self.get_context_data()
+        context['form'] = form
+        return render(request, self.template_name, context)
 
 @login_required
 def assign_project(request, equipe_id):

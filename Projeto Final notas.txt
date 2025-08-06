@@ -65,8 +65,8 @@ lista
 	ok    botao novo projeto da 403 para membros - criar popup negando acesso?
 	ok    pagina de detalhes do projeto
 	ok        criador da tarefa pode edita-la
-	        botao de entrega e
-	        enviar relatorio ao concluir projeto
+	ok        botao de entrega e
+	ok        enviar relatorio ao concluir projeto
 	        adicionar tarefas ao projeto
 	            CRUD de tarefas
 	            lista de tarefas na pagina de projetos

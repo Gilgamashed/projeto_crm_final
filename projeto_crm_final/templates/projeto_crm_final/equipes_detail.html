@@ -89,6 +89,36 @@
         background: #3498db;
         border-radius: 3px;
     }
+    /* Add consistent spacing */
+    .card {
+        margin-bottom: 1.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+        border-radius: 0.75rem 0.75rem 0 0 !important;
+    }
+
+    /* Better file input styling */
+    .input-group .btn-outline-secondary {
+        border-color: #ced4da;
+    }
+
+    .input-group .btn-outline-secondary:hover {
+        background-color: #e9ecef;
+    }
+
+    /* Better spacing for form elements */
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Consistent margins */
+    .mb-4, .mb-3, .mb-2 {
+        margin-bottom: 1rem !important;
+    }
 </style>
 
 <main class="container py-4">
@@ -146,7 +176,7 @@
                 </div>
 
                 {% if active_projeto and user == equipe.leader.user %}
-                <div class="card-footer bg-light">
+                <div class="card-footer bg-light d-flex justify-content-between">
                     <form method="post" action="{% url 'remove_projeto' equipe.id %}">
                         {% csrf_token %}
                         <input type="hidden" name="projeto_id" value="{{ active_projeto.id }}">
@@ -154,13 +184,19 @@
                             <i class="bi bi-x-circle"></i> Remover Projeto
                         </button>
                     </form>
+
+                   <button class="btn btn-success"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalConcluir">
+                      Concluir Projeto
+                    </button>
                 </div>
                 {% endif %}
             </div>
             
             <!-- selecionar projeto (pro lider apenas) -->
             {% if user == equipe.leader.user %}
-            <div class="card border-primary">
+            <div class="card border-primary mb-4">
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0">Trabalhar em um Novo Projeto</h4>
                 </div>
@@ -187,6 +223,7 @@
             </div>
             {% endif %}
 
+            <!-- Convidar membros -->
             {% if user == equipe.leader.user or user.integrantes.role == 'ADMIN' %}
             <div class="card border-success mb-4">
                 <div class="card-header bg-success text-white">
@@ -298,7 +335,7 @@
     </div>
     
     <!-- Membros -->
-    <div class="row">
+    <div class="row mt-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="section-title">Membros da Equipe</h2>
@@ -392,5 +429,59 @@
     </div>
 </div>
 {% endif %}
+
+<!-- Modal pra concluir projeto -->
+{% if user == equipe.leader.user or user.integrantes.role == 'ADMIN' %}
+<div class="modal fade" id="modalConcluir" tabindex="-1" aria-labelledby="modalConcluirLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" enctype="multipart/form-data" action="{% url 'equipes_detail' equipe.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="projeto_id" value="{{ active_projeto.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalConcluirLabel">Concluir Projeto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if active_projeto %}
+                    <p>Confirme a conclusão do projeto <strong>{{ active_projeto.name }}</strong> e envie o relatório final.</p>
+
+                    <div class="mb-3">
+                        <label for="id_arquivo" class="form-label">Relatório Final:</label>
+                        <div class="input-group">
+                            <input type="file" class="form-control" id="id_arquivo" name="arquivo" accept=".pdf,.docx,.xlsx">
+                            <button class="btn btn-outline-secondary" type="button" id="button-addon2">
+                            <i class="bi bi-upload"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">Envie o relatório em PDF, DOCX ou XLSX (máx. 20MB)</div>
+
+            <!-- erros? -->
+                        {% if form.arquivo.errors %}
+                        <div class="alert alert-danger mt-2">
+                            {% for error in form.arquivo.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        Nenhum projeto ativo encontrado para conclusão
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    {% if active_projeto %}
+                    <button type="submit" class="btn btn-success">Concluir e Enviar</button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 
 {% endblock %}

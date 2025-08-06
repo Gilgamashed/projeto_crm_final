@@ -1,8 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
-from .models import Integrantes, Projetos, Tarefas, Equipes
+from .models import Integrantes, Projetos, Tarefas, Equipes, RelatorioProjeto
 
 
 class SignupForm(UserCreationForm):
@@ -212,6 +213,22 @@ class ProjetosForm(forms.ModelForm):
             raise forms.ValidationError("Prazo deve ser uma data futura!")
         return date
 
+
+class RelatorioForm(forms.ModelForm):
+    class Meta:
+        model = RelatorioProjeto
+        fields = ['arquivo']
+        widgets = {
+            'arquivo': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+    def clean_arquivo(self):
+        file = self.cleaned_data.get('arquivo')
+        if file:
+            if file.size > 20 * 1024 * 1024:
+                raise ValidationError("O arquivo é muito grande (máx. 20MB)")
+            # Validar extensao?
+
+        return file
 
 class TarefasForm(forms.ModelForm):
     class Meta:
