@@ -21,7 +21,7 @@ from django.views.generic import TemplateView, CreateView, DetailView, ListView,
 
 from projeto_crm_final.constants import HIERARCH, CATEGORIA, PRIORIDADE, STATUS
 from projeto_crm_final.forms import SignupForm, ProjetosForm, EquipesForm, ProfileForm, CredentialsForm, RelatorioForm, \
-    TarefasForm
+    TarefasForm, RelatorioTarefaForm
 from projeto_crm_final.mixins import AdminRequiredMixin, LeadRequiredMixin, ProjetoOwnerMixin
 from projeto_crm_final.models import Integrantes, Projetos, Tarefas, Equipes
 
@@ -130,18 +130,59 @@ def change_password(request):
 class PassResetView(TemplateView):
     template_name = "account/password_reset.html"
 
+#------------ Dashboard -----------
 class DashboardView(LoginRequiredMixin, TemplateView):
-    model= Integrantes
-    template_name = "projeto_crm_final/dashboard.html"
-    context_object_name= 'user'
+    template_name = 'projeto_crm_final/dashboard.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        is_authenticated = self.request.user.is_authenticated
-        usuario = Integrantes.objects.get(user=self.request.user)
-        context['is_admin'] = Integrantes.objects.filter(user=self.request.user).exists() if is_authenticated and usuario.role == 'ADMIN' else False
+        user = self.request.user
+
+        try:
+            integrante = Integrantes.objects.get(user=user)
+            context['integrante'] = integrante
+
+            if integrante.equipe:
+                context['equipe'] = integrante.equipe
+
+                active_projeto = Projetos.objects.filter(       #pega projeto ativo
+                    equipe=integrante.equipe,
+                    status='active'
+                ).first()
+
+                if active_projeto:
+                    context['active_projeto'] = active_projeto
+                    context['todo_tasks'] = Tarefas.objects.filter(
+                        projetoparent=active_projeto,
+                        status='todo'
+                    )
+                    context['doing_tasks'] = Tarefas.objects.filter(
+                        projetoparent=active_projeto,
+                        status='doing'
+                    )
+                    context['done_tasks'] = Tarefas.objects.filter(
+                        projetoparent=active_projeto,
+                        status='done'
+                    )
+                else:
+                    context['active_projeto'] = None
+            else:
+                context['no_team'] = True
+
+        except Integrantes.DoesNotExist:
+            context['no_profile'] = True
 
         return context
+
+# ------- Tarefas - Outras no fim do codigo! ----------
+class TarefasAssign(View):
+    def post(self, request, task_id):
+        integrante = Integrantes.objects.get(user=request.user)
+        task = Tarefas.objects.get(id=task_id)
+        task.responsavel = integrante
+        task.status = 'doing'
+        task.save()
+        return redirect('dashboard')
 
 
 #---Integrantes
@@ -703,3 +744,102 @@ class TarefasDetailView(LoginRequiredMixin, DetailView):
         context['STATUS'] = STATUS
         return context
 
+
+class TarefasReportView(LoginRequiredMixin, View):
+    template_name = 'projeto_crm_final/tarefas_report.html'
+
+    def get(self, request, task_id):
+        task = get_object_or_404(Tarefas, id=task_id)
+
+        # Responsavel pela tarefa
+        if task.responsavel.user != request.user:
+            messages.error(request, "Você não é o responsável por esta tarefa.")
+            return redirect('dashboard')
+
+        form = RelatorioTarefaForm()
+        return render(request, self.template_name, {
+            'task': task,
+            'form': form
+        })
+
+    def post(self, request, task_id):
+        task = get_object_or_404(Tarefas, id=task_id)
+        integrante = request.user.integrantes
+
+        # Responsavel pela tarefa de novo!
+        if task.responsavel != integrante:
+            messages.error(request, "Você não é o responsável por esta tarefa.")
+            return redirect('dashboard')
+
+        form = RelatorioTarefaForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            # Salva o relatorio
+            relatorio = form.save(commit=False)
+            relatorio.tarefa = task
+            relatorio.enviado_por = integrante
+            relatorio.save()
+
+            # Manda pro cloud
+            file = relatorio.arquivo
+            date_prefix = timezone.now().strftime('%Y_%m_%d')
+            filename = f'{date_prefix}_relatorio_{task.id}_{task.name[:20]}'
+
+            try:
+                upload_result = cloudinary.uploader.upload(
+                    file=file,
+                    asset_folder='relatorios_tarefas',
+                    public_id=filename,
+                    override=True,
+                    resource_type="raw"
+                )
+                # URL
+                relatorio.cloudinary_url = upload_result['secure_url']
+                relatorio.save()
+            except Exception as e:      #debugg
+                messages.warning(request, f"Arquivo salvo localmente. Erro no Cloudinary: {str(e)}")
+
+            # Salva
+            task.status = 'done'
+            task.save()
+
+            # Membros da e quipe
+            team_members = task.projetoparent.equipe.membros.all()
+            emails = [membro.user.email for membro in team_members if membro.user.email]
+
+            # manda email pra todos
+            if emails:
+                subject = f'Tarefa Concluída: {task.name}'
+                message = f'''
+                A tarefa "{task.name}" foi concluída por {integrante.nome}.
+
+                Descrição da tarefa:
+                {task.descricao}
+
+                Relatório:
+                {relatorio.descricao}
+
+                Arquivo do relatório: {relatorio.arquivo.url}
+                '''
+
+                try:
+                    email = EmailMessage(
+                        subject,
+                        message,
+                        settings.DEFAULT_FROM_EMAIL,
+                        emails,
+                        [settings.EMAIL_HOST_USER],
+                    )
+                    if hasattr(relatorio, 'cloudinary_url'):
+                        email.body += f"\nLink Cloudinary: {relatorio.cloudinary_url}"
+                    email.send()
+                except Exception as e:
+                    messages.warning(request, f"Relatório salvo, mas e-mail não enviado: {str(e)}")
+
+            messages.success(request, 'Tarefa concluída e relatório enviado com sucesso!')
+            return redirect('dashboard')
+
+        return render(request, self.template_name, {
+            'task': task,
+            'form': form
+        })

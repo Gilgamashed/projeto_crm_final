@@ -70,14 +70,21 @@ lista
 	ok        enviar relatorio ao concluir projeto
 	        lider pode ter duas equipes?!
 	ok        adicionar tarefas ao projeto
-	            CRUD de tarefas
+	ok            CRUD de tarefas
 	ok                tarefas_create
 	ok                tarefas_edit
-	                tarefas_delete
+	ok                tarefas_delete
 	ok            lista de tarefas na pagina de projetos
 	ok            opção de criar nova tarefa
+	            detalhes da tarefa da 405!!
 	            detalhes da tarefa com espaço pra observações?
-	            enviar relatorio de tarefa individualmente
+	            retirar botao de criar nova equipe se usuario já estiver em uma equipe
+	            bota de sair da equipe
+	ok            KANBAN
+	                Deixa mais bonito?
+	ok                botao de detalhes
+	ok                botao de conclusao com envio de email
+	ok            enviar relatorio de tarefa individualmente
 	      remover botoes de edição de projetos e tarefas concluidas
     ok    remover botão de adicionar projeto para membros.
 	ok    investigar tab cancelado e concluidos
@@ -93,9 +100,9 @@ lista
 	    perfil pode ser visto por outros? sistema de menssagens interno?
 	ok    CRUD de equipes
 	ok    perfil de grupo
-	    link pra pagina do projeto
+	ok    link pra pagina do projeto
 	    lider pode criar tarefas dentro do projeto
-	    enviar relatorio de conclusao dee tarefas?
+	ok    enviar relatorio de conclusao dee projeto?
 	ok    sistema de convite
 	    cobrir com testes
 

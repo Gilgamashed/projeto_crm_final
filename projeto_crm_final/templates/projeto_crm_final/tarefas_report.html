@@ -1,0 +1,34 @@
+{% extends 'projeto_crm_final/base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2>Concluir Tarefa: {{ task.name }}</h2>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label class="form-label">Descrição do Relatório</label>
+                    {% render_field form.descricao class="form-control" %}
+                    <div class="form-text">Descreva o trabalho realizado e os resultados obtidos</div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label">Anexar Arquivo</label>
+                    {% render_field form.arquivo class="form-control" %}
+                    <div class="form-text">Formatos aceitos: tem q ver</div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-success">Enviar Relatório</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

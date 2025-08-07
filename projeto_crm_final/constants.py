@@ -2,7 +2,7 @@
 
 STATUS = [
     ('todo','Para fazer'),
-    ('emandamento','Em andamento'),
+    ('doing','Em andamento'),
     ('done','Feito'),
     ('late','Atrasada'),
     ('canceled','Cancelada')

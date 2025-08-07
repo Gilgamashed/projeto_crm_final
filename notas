@@ -16,16 +16,20 @@ ok  CRUD de tarefas, vinculadas a um time e a um usuário, com título, descriç
 ok  Visualização das tarefas por usuário.
 ok  Filtro de tarefas por status ou prioridade.
 ok? Sistema de autenticação.
-Envio de e-mail de notificação ao atribuir uma tarefa.
+ok  Envio de e-mail de notificação ao atribuir uma tarefa.
 Deploy no Render.
 
 testes
 crud
+    usuario
+    equipes
+    projetos
+    tarefas
 autenticacao
 validacao de forms
 
 🚀 Funcionalidades Estendidas (Desafio):
-Visualização de tarefas por Kanban (To Do, Doing, Done).
+ok Visualização de tarefas por Kanban (To Do, Doing, Done).
 Dashboard com tarefas atrasadas e concluídas.
 Exportação de tarefas em CSV.
 Histórico de movimentação da tarefa (audit log).

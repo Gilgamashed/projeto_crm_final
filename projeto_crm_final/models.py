@@ -127,6 +127,17 @@ class Tarefas(models.Model):
         return f"{self.name} | {self.get_status_display()}"
 
 
+class RelatorioTarefa(models.Model):
+    tarefa = models.ForeignKey(Tarefas, on_delete=models.CASCADE, related_name='relatorios')
+    descricao = models.TextField()
+    arquivo = models.FileField(upload_to='relatorios_tarefas/')
+    enviado_por = models.ForeignKey(Integrantes, on_delete=models.CASCADE)
+    data_envio = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Relatório para {self.tarefa.titulo} - {self.data_envio}"
+
+
 class AuditLog(models.Model):
     usuario = models.ForeignKey(Integrantes, on_delete=models.SET_NULL, null=True)
     action = models.CharField(max_length=100)       #o que ocorreu

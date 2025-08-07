@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from .models import Integrantes, Projetos, Tarefas, Equipes, RelatorioProjeto
+from .models import Integrantes, Projetos, Tarefas, Equipes, RelatorioProjeto, RelatorioTarefa
 
 from .constants import PRIORIDADE, STATUS
 
@@ -289,5 +289,14 @@ class TarefasForm(forms.ModelForm):
                 raise ValidationError("O responsável deve pertencer à equipe designada do projeto.")
 
         return cleaned_data
+
+class RelatorioTarefaForm(forms.ModelForm):
+    class Meta:
+        model = RelatorioTarefa
+        fields = ['descricao', 'arquivo']
+        widgets = {
+            'descricao': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+            'arquivo': forms.FileInput(attrs={'class': 'form-control'}),
+        }
 
 

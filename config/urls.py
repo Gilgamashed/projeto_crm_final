@@ -25,7 +25,7 @@ from projeto_crm_final.views import SignUpView, HomeView, PassResetView, Dashboa
     UpdateRoleView, IntegrantesListaView, ProjetosCreateView, ProjetosUpdateView, ProjetosView, ProjetosGetView, \
     ProjetosDeleteView, EquipesView, EquipesCreateView, EquipesUpdateView, EquipesGetView, EquipesDeleteView, \
     assign_project, remove_project, edit_profile, delete_account, edit_account_info, change_password, equipes_invite, \
-    TarefasCreateView, TarefasUpdateView, TarefasDeleteView, TarefasDetailView
+    TarefasCreateView, TarefasUpdateView, TarefasDeleteView, TarefasDetailView, TarefasAssign, TarefasReportView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -60,8 +60,10 @@ urlpatterns = [
     path("projetos/<int:projeto_id>", ProjetosGetView.as_view(), name='projetos_detail'),
     path('projetos/<int:pk>/excluir/', ProjetosDeleteView.as_view(), name='projetos_delete'),
 
+    path('tarefas/<int:task_id>/', TarefasAssign.as_view(), name='tarefas_assign'),
     path('projetos/<int:projeto_id>/tarefas/novo/', TarefasCreateView.as_view(),name='tarefas_create'),
     path('tarefas/editar/<int:pk>/', TarefasUpdateView.as_view(), name='tarefas_edit'),
     path('tarefas/excluir/<int:pk>/', TarefasDeleteView.as_view(), name='tarefas_delete'),
     path('tarefas/<int:pk>/', TarefasDetailView.as_view(), name='tarefas_detail'),
+    path('tarefas/concluir/<int:task_id>/', TarefasReportView.as_view(), name='tarefas_report'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
