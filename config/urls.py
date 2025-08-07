@@ -25,7 +25,7 @@ from projeto_crm_final.views import SignUpView, HomeView, PassResetView, Dashboa
     UpdateRoleView, IntegrantesListaView, ProjetosCreateView, ProjetosUpdateView, ProjetosView, ProjetosGetView, \
     ProjetosDeleteView, EquipesView, EquipesCreateView, EquipesUpdateView, EquipesGetView, EquipesDeleteView, \
     assign_project, remove_project, edit_profile, delete_account, edit_account_info, change_password, equipes_invite, \
-    TarefasCreateView, TarefasUpdateView, TarefasDeleteView
+    TarefasCreateView, TarefasUpdateView, TarefasDeleteView, TarefasDetailView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -63,4 +63,5 @@ urlpatterns = [
     path('projetos/<int:projeto_id>/tarefas/novo/', TarefasCreateView.as_view(),name='tarefas_create'),
     path('tarefas/editar/<int:pk>/', TarefasUpdateView.as_view(), name='tarefas_edit'),
     path('tarefas/excluir/<int:pk>/', TarefasDeleteView.as_view(), name='tarefas_delete'),
+    path('tarefas/<int:pk>/', TarefasDetailView.as_view(), name='tarefas_detail'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

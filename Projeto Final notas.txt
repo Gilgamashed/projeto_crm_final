@@ -69,13 +69,13 @@ lista
 	ok        botao de entrega e
 	ok        enviar relatorio ao concluir projeto
 	        lider pode ter duas equipes?!
-	        adicionar tarefas ao projeto
+	ok        adicionar tarefas ao projeto
 	            CRUD de tarefas
-	                tarefas_create
-	                tarefas_edit
+	ok                tarefas_create
+	ok                tarefas_edit
 	                tarefas_delete
-	            lista de tarefas na pagina de projetos
-	            opção de criar nova tarefa
+	ok            lista de tarefas na pagina de projetos
+	ok            opção de criar nova tarefa
 	            detalhes da tarefa com espaço pra observações?
 	            enviar relatorio de tarefa individualmente
 	      remover botoes de edição de projetos e tarefas concluidas

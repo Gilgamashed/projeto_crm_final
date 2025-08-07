@@ -663,7 +663,6 @@ class TarefasUpdateView(LoginRequiredMixin, UpdateView):
 
 class TarefasDeleteView(LoginRequiredMixin, DeleteView):
     model = Tarefas
-    template_name = "projeto_crm_final/tarefas_confirm_delete.html"
     pk_url_kwarg = "pk"
 
     def dispatch(self, request, *args, **kwargs):
@@ -672,16 +671,35 @@ class TarefasDeleteView(LoginRequiredMixin, DeleteView):
         # Permissão
         if not (request.user.integrantes == self.projeto.criador or request.user.integrantes.role == "ADMIN"):
             messages.error(request, "Você não tem permissão para excluir esta tarefa.")
-            return redirect("projetos_detail", pk=self.projeto.pk)
+            return redirect("projetos_detail", projeto_id=self.projeto.pk)
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         messages.success(self.request, "Tarefa excluída com sucesso!")
-        return reverse("projetos_detail", kwargs={"pk": self.projeto.pk})
+        return reverse("projetos_detail", kwargs={"projeto_id": self.projeto.pk})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["tarefa"] = self.tarefa
         context["projeto"] = self.projeto
+        return context
+
+        #metodo pro modal funcionar
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': True})
+        return response
+
+class TarefasDetailView(LoginRequiredMixin, DetailView):
+    model = Tarefas
+    template_name = "projeto_crm_final/tarefas_detail.html"
+    context_object_name = "tarefa"
+    pk_url_kwarg = "pk"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['PRIORIDADE'] = PRIORIDADE
+        context['STATUS'] = STATUS
         return context
 

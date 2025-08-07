@@ -49,6 +49,16 @@
     font-size: 0.8rem;
 }
 
+/* botoes de tarefas */
+.btn-group .btn {
+    margin-left: 5px;
+}
+
+.badge-bg-urgente { background-color: #dc3545; color: white; }
+.badge-bg-alta { background-color: #ffc107; color: black; }
+.badge-bg-regular { background-color: #6c757d; color: white; }
+.badge-bg-baixa { background-color: #0dcaf0; color: black; }
+
 </style>
 
 <!-- card principal -->
@@ -80,7 +90,16 @@
           <p> {{projeto.descricao}}</p>
         </div>
         <div class="col-md-6">
-          <p><strong>Equipe:</strong> {{ projeto.equipe|default:"Aguardando..." }}</p>
+            <p>
+                <strong>Equipe:</strong>
+                {% with projeto.equipe as equipe %}
+                  {% if equipe %}
+                    <a href="{% url 'equipes_detail' equipe.id %}" class="ms-2">{{ equipe.name }}</a>
+                  {% else %}
+                    Aguardando...
+                  {% endif %}
+                {% endwith %}
+            </p>
           <p><strong>Iniciado:</strong> {{ projeto.inicio }}</p>
           <p><strong>Prazo:</strong> {{ projeto.prazofinal }}</p>
         </div>
@@ -160,9 +179,16 @@
                                     </span>
                                 </div>
 
+                                <div class="btn-group">
+                                <!-- botao Detalhes - visivel a tods -->
+                                <a href="{% url 'tarefas_detail' tarefa.id %}"
+                                   class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+
                                 <!-- Edição apenas pra lider/admin -->
                                 {% if can_create %}
-                                <div>
+
                                     <button class="btn btn-sm btn-outline-primary"
                                             data-bs-toggle="modal"
                                             data-bs-target="#modalEditarTarefa"
@@ -174,8 +200,18 @@
                                             data-prioridade="{{ tarefa.prioridade }}">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                </div>
                                 {% endif %}
+                                <!-- Botão delete tarefa-->
+                                    {% if can_create %}
+                                    <button class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalExcluirTarefa"
+                                            data-id="{{ tarefa.id }}"
+                                            data-name="{{ tarefa.name }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -303,7 +339,7 @@
                 <option value="">Não atribuído</option>
                 {% if projeto.equipe %}
                     {% for membro in projeto.equipe.membros.all %}
-                        <!-- Add selected attribute if current user -->
+                        <!-- prioridade pro integrante logado -->
                         <option value="{{ membro.person_id }}"
                             {% if membro == request.user.integrantes %}selected{% endif %}>
                             {{ membro.nome }} {{ membro.sobrenome }}
@@ -337,9 +373,32 @@
   </div>
 </div>
 
+<!-- Modal excluir tarefa -->
+<div class="modal fade" id="modalExcluirTarefa" tabindex="-1" aria-labelledby="modalExcluirTarefaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="post" id="formExclusaoTarefa">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="modalExcluirTarefaLabel">Confirmar Exclusão</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Tem certeza que deseja excluir a tarefa <strong id="tarefaName"></strong>?
+          <p class="text-muted mt-2">Esta ação não pode ser desfeita.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 
 <script>
-    // modalExcluir
+    // modalExcluir PROJETO
     const modalExcluir = document.getElementById('modalExcluir');
     const projetoName = document.getElementById('projetoName');
     const formExclusao = document.getElementById('formExclusao');
@@ -377,6 +436,20 @@
         // Update form URL
         const form = editTaskModal.querySelector('form');
         form.action = `/tarefas/editar/${tarefaId}/`;
+    });
+
+    // Modal excluir tarefa
+    const modalExcluirTarefa = document.getElementById('modalExcluirTarefa');
+    const tarefaName = document.getElementById('tarefaName');
+    const formExclusaoTarefa = document.getElementById('formExclusaoTarefa');
+
+    modalExcluirTarefa.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const tarefaId = button.getAttribute('data-id');
+        const name = button.getAttribute('data-name');
+
+        tarefaName.textContent = name;
+        formExclusaoTarefa.action = `/tarefas/excluir/${tarefaId}/`;
     });
 </script>
 

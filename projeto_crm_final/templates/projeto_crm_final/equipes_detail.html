@@ -192,6 +192,15 @@
                     </button>
                 </div>
                 {% endif %}
+
+                <!-- Botão visível para qualquer usuário logado -->
+                {% if active_projeto and user.is_authenticated %}
+                <div class="card-footer bg-light text-end">
+                    <a href="{% url 'projetos_detail' active_projeto.id %}" class="btn btn-info btn-sm">
+                        <i class="bi bi-info-circle"></i> Detalhes
+                    </a>
+                </div>
+                {% endif %}
             </div>
             
             <!-- selecionar projeto (pro lider apenas) -->

@@ -1,0 +1,67 @@
+{% extends 'projeto_crm_final/base.html' %}
+{% load widget_tweaks %}
+{% block title %}{{ tarefa.name }}{% endblock %}
+{% block content %}
+
+<style>
+.btn-group .btn {
+    margin-left: 5px;
+}
+
+.badge-bg-urgente { background-color: #dc3545; color: white; }
+.badge-bg-alta { background-color: #ffc107; color: black; }
+.badge-bg-regular { background-color: #6c757d; color: white; }
+.badge-bg-baixa { background-color: #0dcaf0; color: black; }
+</style>
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h2>{{ tarefa.name }}</h2>
+            <span class="badge
+                {% if tarefa.prioridade == 'urgente' %}bg-danger
+                {% elif tarefa.prioridade == 'alta' %}bg-warning
+                {% elif tarefa.prioridade == 'regular' %}bg-secondary
+                {% elif tarefa.prioridade == 'baixa' %}bg-info
+                {% endif %}">
+                {{ tarefa.get_prioridade_display }}
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Descrição:</strong></p>
+                    <p>{{ tarefa.descricao }}</p>
+                    
+                    <p><strong>Status:</strong>
+                        <span class="badge ms-2
+                            {% if tarefa.status == 'todo' %}bg-secondary
+                            {% elif tarefa.status == 'doing' %}bg-warning
+                            {% elif tarefa.status == 'done' %}bg-success
+                            {% endif %}">
+                            {{ tarefa.get_status_display }}
+                        </span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Responsável:</strong>
+                        {% if tarefa.responsavel %}
+                            {{ tarefa.responsavel.nome }} {{ tarefa.responsavel.sobrenome }}
+                        {% else %}
+                            Não atribuído
+                        {% endif %}
+                    </p>
+                    <p><strong>Prazo:</strong> {{ tarefa.prazofinal|date:"d/m/Y" }}</p>
+                    <p><strong>Criado em:</strong> {{ tarefa.inicio|date:"d/m/Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <a href="{% url 'projetos_detail' tarefa.projetoparent.id %}" class="btn btn-primary">
+                Voltar ao projeto
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
