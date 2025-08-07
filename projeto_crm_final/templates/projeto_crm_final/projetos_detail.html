@@ -109,7 +109,7 @@
 
           <!-- area do criador -->
         </div>
-        {% if projeto.criador == request.user.integrantes %}
+        {% if projeto.criador == request.user.integrantes and projeto.status not in 'done canceled' %}
         <div class="col-md-6">
           <a href="{% url 'projetos_edit' projeto.pk %}" class="btn btn-warning btn-sm">
             Atualizar projeto
@@ -125,6 +125,7 @@
       </div>
     </div>
   </div>
+    <!-- botoes de navegacao -->
   <div class="mt-4">
     <a href="{% url 'dashboard' %}" class="btn btn-primary">
       Voltar à sua home
@@ -141,7 +142,15 @@
             <h2>Tarefas</h2>
             <!-- area de lider e admin -->
             {% if can_create %}
-            <button class="btn btn-success btn-sm"
+            <!-- Botão de exportar CSV -->
+                {% if projeto.status == 'active' %}
+                <div class="mb-3">
+                  <a href="{% url 'projetos_tarefas_csv' projeto.id %}" class="btn btn-outline-success">
+                    <i class="bi bi-file-earmark-excel"></i> Exportar Tarefas (CSV)
+                  </a>
+                </div>
+                {% endif %}
+            <button class="btn btn-success btn-sm mb-3"
                     data-bs-toggle="modal"
                     data-bs-target="#modalAdicionarTarefa">
                 <i class="bi bi-plus-circle"></i> Nova Tarefa
@@ -187,7 +196,7 @@
                                 </a>
 
                                 <!-- Edição apenas pra lider/admin -->
-                                {% if can_create %}
+                                {% if can_create and projeto.status not in 'done canceled' %}
 
                                     <button class="btn btn-sm btn-outline-primary"
                                             data-bs-toggle="modal"
@@ -202,7 +211,7 @@
                                     </button>
                                 {% endif %}
                                 <!-- Botão delete tarefa-->
-                                    {% if can_create %}
+                                    {% if can_create and projeto.status not in 'done canceled' %}
                                     <button class="btn btn-sm btn-outline-danger"
                                             data-bs-toggle="modal"
                                             data-bs-target="#modalExcluirTarefa"

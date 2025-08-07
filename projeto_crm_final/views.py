@@ -1,3 +1,4 @@
+import csv
 import mimetypes
 
 import cloudinary
@@ -12,7 +13,7 @@ from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.db import models
 from django.db.models import Count, Q
-from django.http import JsonResponse, HttpResponseForbidden, request, HttpResponseRedirect, Http404
+from django.http import JsonResponse, HttpResponseForbidden, request, HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
@@ -260,9 +261,25 @@ class EquipesCreateView(LoginRequiredMixin, CreateView):
         kwargs['request'] = self.request
         return kwargs
 
+    def dispatch(self, request, *args, **kwargs):
+        # Qm já tem uma equipe nao pode criar uma nova
+        if hasattr(request.user, 'integrantes') and request.user.integrantes.equipe:
+            messages.warning(
+                request,
+                "Você já faz parte de uma equipe. Saia da sua equipe atual para criar uma nova."
+            )
+            return redirect('equipes_list')
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         try:
             integrante = self.request.user.integrantes   #instancia o criador
+            if integrante.equipe:                       #garante que usuario nao tem time
+                messages.error(
+                    self.request,
+                    "Você já faz parte de uma equipe. Saia da sua equipe atual para criar uma nova."
+                )
+                return redirect('equipes_list')
             form.instance.leader = integrante   #adiciona criador como lider da equipe
             team = form.save()                  #salva antes pra não bugar o relacionamento entre models
             team.membros.add(integrante)        #adiciona criador aos membros
@@ -282,6 +299,29 @@ class EquipesCreateView(LoginRequiredMixin, CreateView):
         # debugggg
         logger.error(f"Form invalid: {form.errors}")
         return super().form_invalid(form)
+
+
+class EquipesLeaveView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        integrante = request.user.integrantes
+
+        #Lider deve passar liderança antes de sair
+        if integrante.role == 'LEAD':
+            messages.error(
+                request,
+                "Você é o líder desta equipe. Transfira a liderança antes de sair."
+            )
+            return redirect('equipes_detail', equipe_id=integrante.equipe.id)
+
+        #sai do grupo
+        team = integrante.equipe
+        team.membros.remove(integrante)
+        integrante.equipe = None
+        integrante.role = 'MEMBER'  # volta a seer membro
+        integrante.save()
+
+        messages.success(request, "Você saiu da equipe com sucesso!")
+        return redirect('equipes_list')
 
 
 class EquipesUpdateView(LoginRequiredMixin, LeadRequiredMixin, UpdateView):
@@ -645,10 +685,25 @@ class TarefasCreateView(LoginRequiredMixin, CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.projeto = get_object_or_404(Projetos, pk=self.kwargs["projeto_id"])
-        # só o criador do projeto ou um ADMIN pode criar tarefas
-        if not (request.user.integrantes == self.projeto.criador or request.user.integrantes.role == "ADMIN"):
+
+        # Checa se o projeto está sendo trabalhado por um time
+        if not self.projeto.equipe:
+            messages.error(request,
+            "Projeto não está atribuído a uma equipe. Atribua o projeto a uma equipe antes de criar tarefas.")
+            return redirect("projetos_detail", projeto_id=self.projeto.pk)
+
+        # Confere se usuario é parte do time que trabalha com o projeto
+        user_team = request.user.integrantes.equipe
+        if not user_team or user_team != self.projeto.equipe:
+            messages.error(request, "Você não faz parte da equipe deste projeto.")
+            return redirect("projetos_detail", projeto_id=self.projeto.pk)
+
+        # Checa se usuario criou a tarefa OU se é ADMIN
+        if not (request.user.integrantes == self.projeto.criador or
+                request.user.integrantes.role == "ADMIN"):
             messages.error(request, "Você não tem permissão para criar tarefas para este projeto.")
             return redirect("projetos_detail", projeto_id=self.projeto.pk)
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
@@ -843,3 +898,55 @@ class TarefasReportView(LoginRequiredMixin, View):
             'task': task,
             'form': form
         })
+
+class TarefasExportCSSView(LoginRequiredMixin, LeadRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        # Checa o projeto ativo do time
+        integrante = request.user.integrantes
+        if not integrante or not integrante.equipe:
+            return HttpResponse("Usuário sem equipe", status=400)
+
+        #Checagem pra ver se a equipe tem projeto ativo
+        active_project = Projetos.objects.filter(
+            equipe=integrante.equipe,
+            status='active'
+        ).first()
+
+        if not active_project:
+            return HttpResponse("Nenhum projeto ativo", status=400)
+
+        messages.success(self.request, "Download CSV iniciado...")
+
+        # Cria a HttpResponse com header CSV
+        response = HttpResponse(content_type='text/csv')
+        timestamp = timezone.now().strftime('%Y_%m_%d')
+        filename = f'tarefas_{active_project.name}_{timestamp}.csv'
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+        # CSV começa aqui!
+        writer = csv.writer(response)
+
+        # Colunas
+        writer.writerow([
+            'Nome', 'Descrição', 'Status', 'Prioridade',
+            'Responsável', 'Data Criação', 'Prazo Final'
+        ])
+
+        # Linhas
+        tasks = Tarefas.objects.filter(projetoparent=active_project)
+        for task in tasks:
+            writer.writerow([
+                task.name,
+                task.descricao,
+                task.get_status_display(),
+                task.get_prioridade_display(),
+                f"{task.responsavel.nome} {task.responsavel.sobrenome}" if task.responsavel else "Não atribuído",
+                task.inicio.strftime('%d/%m/%Y %H:%M'),
+                task.prazofinal.strftime('%d/%m/%Y') if task.prazofinal else ""
+            ])
+
+        # Menssagens
+        storage = messages.get_messages(request)
+        storage.used = False  #???
+
+        return response

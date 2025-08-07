@@ -25,7 +25,8 @@ from projeto_crm_final.views import SignUpView, HomeView, PassResetView, Dashboa
     UpdateRoleView, IntegrantesListaView, ProjetosCreateView, ProjetosUpdateView, ProjetosView, ProjetosGetView, \
     ProjetosDeleteView, EquipesView, EquipesCreateView, EquipesUpdateView, EquipesGetView, EquipesDeleteView, \
     assign_project, remove_project, edit_profile, delete_account, edit_account_info, change_password, equipes_invite, \
-    TarefasCreateView, TarefasUpdateView, TarefasDeleteView, TarefasDetailView, TarefasAssign, TarefasReportView
+    TarefasCreateView, TarefasUpdateView, TarefasDeleteView, TarefasDetailView, TarefasAssign, TarefasReportView, \
+    EquipesLeaveView, TarefasExportCSSView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -47,18 +48,20 @@ urlpatterns = [
 
     path('equipes/', EquipesView.as_view(), name='equipes_list'),
     path('equipes/novo/', EquipesCreateView.as_view(), name='equipes_create'),
+    path('equipes/leave/', EquipesLeaveView.as_view(), name='equipes_leave'),
+    path('equipes/<int:equipe_id>/invite/', equipes_invite, name='equipes_invite'),
     path('equipes/editar/<int:pk>/', EquipesUpdateView.as_view(), name='equipes_edit'),
     path("equipes/<int:equipe_id>", EquipesGetView.as_view(), name='equipes_detail'),
     path('equipes/<int:equipe_id>/projetos/', assign_project, name='equipes_projetos'),
     path('equipes/<int:equipe_id>/remove_projeto/', remove_project, name='remove_projeto'),
     path('equipes/<int:pk>/excluir/', EquipesDeleteView.as_view(), name='equipes_delete'),
-    path('equipes/<int:equipe_id>/invite/', equipes_invite, name='equipes_invite'),
 
     path('projetos/', ProjetosView.as_view() , name='projetos_list'),
     path('projetos/novo/', ProjetosCreateView.as_view(), name='projetos_create'),
     path('projetos/editar/<int:pk>/', ProjetosUpdateView.as_view(), name='projetos_edit'),
     path("projetos/<int:projeto_id>", ProjetosGetView.as_view(), name='projetos_detail'),
     path('projetos/<int:pk>/excluir/', ProjetosDeleteView.as_view(), name='projetos_delete'),
+    path('projetos/<int:projeto_id>/export-tasks/', TarefasExportCSSView.as_view(), name='projetos_tarefas_csv'),
 
     path('tarefas/<int:task_id>/', TarefasAssign.as_view(), name='tarefas_assign'),
     path('projetos/<int:projeto_id>/tarefas/novo/', TarefasCreateView.as_view(),name='tarefas_create'),

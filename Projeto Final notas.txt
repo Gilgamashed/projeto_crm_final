@@ -68,7 +68,7 @@ lista
 	ok        criador da tarefa pode edita-la
 	ok        botao de entrega e
 	ok        enviar relatorio ao concluir projeto
-	        lider pode ter duas equipes?!
+	ok        lider pode ter duas equipes?!
 	ok        adicionar tarefas ao projeto
 	ok            CRUD de tarefas
 	ok                tarefas_create
@@ -76,32 +76,32 @@ lista
 	ok                tarefas_delete
 	ok            lista de tarefas na pagina de projetos
 	ok            opção de criar nova tarefa
-	            detalhes da tarefa da 405!!
+	duvida            detalhes da tarefa da 405!!
 	            detalhes da tarefa com espaço pra observações?
-	            retirar botao de criar nova equipe se usuario já estiver em uma equipe
-	            bota de sair da equipe
+	ok            retirar botao de criar nova equipe se usuario já estiver em uma equipe
+	ok?            bota de sair da equipe (lider precisa desfazer grupo se quiser sair?)
 	ok            KANBAN
 	                Deixa mais bonito?
 	ok                botao de detalhes
 	ok                botao de conclusao com envio de email
 	ok            enviar relatorio de tarefa individualmente
-	      remover botoes de edição de projetos e tarefas concluidas
+	ok      remover botoes de edição de projetos e tarefas concluidas
     ok    remover botão de adicionar projeto para membros.
 	ok    investigar tab cancelado e concluidos
 	ok    criar categorias para projetos
 	ok    filtros por categoria
-	      alterar status do projeto em relaçao ao prazo (atrasado!)
+	duvida      alterar status do projeto em relaçao ao prazo (atrasado!)
 	      deletar nao deleta mas deixa arquivado e ineditavel?
 	    cobrir com testes
 
 
 	Management de equipe
 	ok    perfil de usuario - mais info cargo por exemplo
-	    perfil pode ser visto por outros? sistema de menssagens interno?
+	ok?    perfil pode ser visto por outros? sistema de menssagens interno?
 	ok    CRUD de equipes
 	ok    perfil de grupo
 	ok    link pra pagina do projeto
-	    lider pode criar tarefas dentro do projeto
+	ok    lider pode criar tarefas dentro do projeto
 	ok    enviar relatorio de conclusao dee projeto?
 	ok    sistema de convite
 	    cobrir com testes
@@ -113,6 +113,4 @@ lista
 	Fazer notificações
 	
 	Reports e analytics
-
-	Testes
 

@@ -5,6 +5,7 @@
 
 {% block content %}
 
+<!-- perfil -->
 <div class="container mt-5">
   <div class="card">
     <div class="card-header">
@@ -12,11 +13,13 @@
     </div>
     <div class="card-body">
       <div class="row">
+        <!-- lado esquerdo -->
         <div class="col-md-6">
           <p><strong>Nome:</strong> {{perfil.nome}} {{perfil.sobrenome}}</p>
           <p><strong>Email:</strong> {{perfil.user.email}}</p>
           <p><strong>Cargo:</strong> {{perfil.cargo}}</p>
         </div>
+        <!-- lado direito -->
         <div class="col-md-6">
           <p><strong>Telefone:</strong> {{ perfil.telefone|default:"Não informado" }}</p>
           <p><strong>Role:</strong> {{ perfil.get_role_display }}</p>
@@ -24,23 +27,31 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-mt-4">
-          <a href="{% url 'account_profile_edit' %}" class="btn btn-primary">
-            Editar Perfil
-          </a>
-          <a href="{% url 'account_login_info_edit' %}" class="btn btn-outline-primary">
-              <i class="bi bi-gear"></i> Editar Informações da Conta
-          </a>
+        <!-- botoes -->
+
+          {% if request.user == perfil.user %}
+        <hr class="my-4">
+        <div class="button-group">
+          <div class="col-mt-4 mb-3">
+            <a href="{% url 'account_profile_edit' %}" class="btn btn-primary">
+              Editar Perfil
+            </a>
+            <a href="{% url 'account_login_info_edit' %}" class="btn btn-outline-primary">
+                <i class="bi bi-gear"></i> Editar Informações da Conta
+            </a>
+          </div>
+          <div class="col-mt-4">
+            <form method="post" action="{% url 'update_role' %}" class="role-form">
+                {% csrf_token %}
+                <input type="hidden" name="user_id" value="{{ perfil.person_id }}">
+                <button type="submit" name="role" value='ADMIN' class="btn btn-primary {% if perfil.role == 'ADMIN' %}active{% endif %}">
+                  Tornar Admin
+                </button>
+            </form>
+          </div>
+          {% endif %}
         </div>
-        <div class="col-mt-4">
-          <form method="post" action="{% url 'update_role' %}" class="role-form">
-              {% csrf_token %}
-              <input type="hidden" name="user_id" value="{{ perfil.person_id }}">
-              <button type="submit" name="role" value='ADMIN' class="btn btn-primary {% if perfil.role == 'ADMIN' %}active{% endif %}">
-                Tornar Admin
-              </button>
-          </form>
-        </div>
+        <!-- info da eequipe -->
         <div class="row mt-4">
           <div class="col-md-12">
             <h4 class="border-bottom pb-2">Equipe e Projetos</h4>

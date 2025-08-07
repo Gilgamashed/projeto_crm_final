@@ -266,11 +266,20 @@
 
 
         
-        <!-- delete and edit -->
+        <!-- botoes laterais direito -->
         <div class="col-lg-4">
-            <!-- Edit and Delete Buttons -->
-            {% if user == equipe.leader.user or user.integrantes.role == 'ADMIN' %}
             <div class="d-grid gap-2 mb-4">
+                <!-- sair da equipe -->
+                {% if request.user.integrantes.equipe.id == equipe.id %}
+                  <form method="post" action="{% url 'equipes_leave' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-lg">
+                      <i class="bi bi-box-arrow-right"></i> Sair da Equipe
+                    </button>
+                  </form>
+                {% endif %}
+                <!-- delete and edit -->
+                {% if user == equipe.leader.user or user.integrantes.role == 'ADMIN' %}
                 <a href="{% url 'equipes_edit' equipe.id %}" class="btn btn-warning btn-lg">
                     <i class="bi bi-pencil-square me-2"></i> Editar Equipe
                 </a>
