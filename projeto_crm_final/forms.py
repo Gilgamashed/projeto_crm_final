@@ -5,6 +5,8 @@ from django.core.exceptions import ValidationError
 
 from .models import Integrantes, Projetos, Tarefas, Equipes, RelatorioProjeto
 
+from .constants import PRIORIDADE, STATUS
+
 
 class SignupForm(UserCreationForm):
     nome = forms.CharField(
@@ -231,7 +233,61 @@ class RelatorioForm(forms.ModelForm):
         return file
 
 class TarefasForm(forms.ModelForm):
+    responsavel = forms.ModelChoiceField(
+        queryset=Integrantes.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='Responsável'
+    )
     class Meta:
         model = Tarefas
-        fields = ['tarefa', 'descricao', 'prazofinal', 'prioridade']
-        widgets = {}
+        fields = ['name', 'descricao', 'responsavel', 'prioridade', 'prazofinal']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'descricao': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Descrição objetiva da tarefa e suas atribuições',
+                'rows': 3
+            }),
+
+            'prioridade': forms.Select(attrs={'class': 'form-select'}),
+            'prazofinal': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            })
+        }
+        labels = {'name' : 'Nome da tarefa*',
+                  'descricao' : 'Descrição da tarefa',
+                  'responsavel' : 'Responsavel',
+                  'prioridade' : 'Prioridade*',
+                  'prazofinal' : 'Prazo Final*',
+                  'projetoparent': ''}
+
+    def __init__(self, *args, **kwargs):
+        self.projeto = kwargs.pop('projetoparent', None)
+        super().__init__(*args, **kwargs)
+
+        self.fields['responsavel'].required = False
+        self.fields['responsavel'].help_text = "Deixe em branco para não atribuir a ninguém"
+
+        if self.projeto:
+
+            # Filter team members
+            if self.projeto.equipe:
+                self.fields['responsavel'].queryset = self.projeto.equipe.membros.all()
+            else:
+                self.fields['responsavel'].queryset = Integrantes.objects.none()
+                self.fields['responsavel'].help_text = "O projeto não tem uma equipe atribuída"
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.projeto and self.projeto.equipe:
+            responsavel = cleaned_data.get('responsavel')
+
+            # responsavel precisa ser integrante da equipe
+            if responsavel and responsavel.equipe != self.projeto.equipe:
+                raise ValidationError("O responsável deve pertencer à equipe designada do projeto.")
+
+        return cleaned_data
+
+

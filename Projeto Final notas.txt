@@ -58,6 +58,7 @@ lista
 	Sistema de autenticação
 	    como user vira admin/lead? convite?
 	    lista de integrantes?
+	    retirar botoes de edição de perfis alheios
 	    cobrir com testes
 
 
@@ -67,12 +68,17 @@ lista
 	ok        criador da tarefa pode edita-la
 	ok        botao de entrega e
 	ok        enviar relatorio ao concluir projeto
+	        lider pode ter duas equipes?!
 	        adicionar tarefas ao projeto
 	            CRUD de tarefas
+	                tarefas_create
+	                tarefas_edit
+	                tarefas_delete
 	            lista de tarefas na pagina de projetos
 	            opção de criar nova tarefa
 	            detalhes da tarefa com espaço pra observações?
 	            enviar relatorio de tarefa individualmente
+	      remover botoes de edição de projetos e tarefas concluidas
     ok    remover botão de adicionar projeto para membros.
 	ok    investigar tab cancelado e concluidos
 	ok    criar categorias para projetos
@@ -87,6 +93,7 @@ lista
 	    perfil pode ser visto por outros? sistema de menssagens interno?
 	ok    CRUD de equipes
 	ok    perfil de grupo
+	    link pra pagina do projeto
 	    lider pode criar tarefas dentro do projeto
 	    enviar relatorio de conclusao dee tarefas?
 	ok    sistema de convite
@@ -101,3 +108,4 @@ lista
 	Reports e analytics
 
 	Testes
+

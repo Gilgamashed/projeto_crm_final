@@ -12,15 +12,16 @@ from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.db import models
 from django.db.models import Count, Q
-from django.http import JsonResponse, HttpResponseForbidden, request
+from django.http import JsonResponse, HttpResponseForbidden, request, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, DeleteView, UpdateView
 
-from projeto_crm_final.constants import HIERARCH, CATEGORIA, PRIORIDADE
-from projeto_crm_final.forms import SignupForm, ProjetosForm, EquipesForm, ProfileForm, CredentialsForm, RelatorioForm
+from projeto_crm_final.constants import HIERARCH, CATEGORIA, PRIORIDADE, STATUS
+from projeto_crm_final.forms import SignupForm, ProjetosForm, EquipesForm, ProfileForm, CredentialsForm, RelatorioForm, \
+    TarefasForm
 from projeto_crm_final.mixins import AdminRequiredMixin, LeadRequiredMixin, ProjetoOwnerMixin
 from projeto_crm_final.models import Integrantes, Projetos, Tarefas, Equipes
 
@@ -566,14 +567,21 @@ class ProjetosGetView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Checagem para criação de novos projetos
-        context['can_create'] = False
+        projeto = self.get_object()
+        context["tarefas"] = projeto.tarefas_do_projeto.all().order_by("prazofinal")
+
+        # Verifica se o usuário pode criar/editar tarefas
+        can_create = False
         if self.request.user.is_authenticated:
-            try:
-                integrante = Integrantes.objects.get(user=self.request.user)
-                context['can_create'] = integrante.role in ['ADMIN', 'LEAD']
-            except Integrantes.DoesNotExist:
-                pass
+            integrante = self.request.user.integrantes
+            if integrante == projeto.criador or integrante.role == "ADMIN":
+                can_create = True
+        context["can_create"] = can_create
+
+        # Adiciona o formulário de tarefas ao contexto
+        context["form_tarefa"] = TarefasForm(projetoparent=projeto)
+        context["PRIORIDADE"] = PRIORIDADE
+
         return context
 
 class ProjetosDeleteView(LoginRequiredMixin,LeadRequiredMixin, ProjetoOwnerMixin, DeleteView):
@@ -588,33 +596,92 @@ class ProjetosDeleteView(LoginRequiredMixin,LeadRequiredMixin, ProjetoOwnerMixin
 
 
 #--------------- TAREFAS
-"""
-class TarefasView(LoginRequiredMixin, ListView):
-    model= Tarefas
-    template_name=
-    context_object_name= 'tarefas'
 
-class TarefasCreateView(LoginRequiredMixin, LeadRequiredMixin, CreateView):
+class TarefasCreateView(LoginRequiredMixin, CreateView):
     model = Tarefas
     form_class = TarefasForm
-    template_name = 'projeto_crm_final/tarefas_form.html'
-    success_url = reverse_lazy('')
+    template_name = "projeto_crm_final/projetos_detail.html"
 
-class TarefasUpdateView(LoginRequiredMixin, LeadRequiredMixin, ProjetoOwnerMixin, UpdateView):
+    def dispatch(self, request, *args, **kwargs):
+        self.projeto = get_object_or_404(Projetos, pk=self.kwargs["projeto_id"])
+        # só o criador do projeto ou um ADMIN pode criar tarefas
+        if not (request.user.integrantes == self.projeto.criador or request.user.integrantes.role == "ADMIN"):
+            messages.error(request, "Você não tem permissão para criar tarefas para este projeto.")
+            return redirect("projetos_detail", projeto_id=self.projeto.pk)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["projetoparent"] = self.projeto
+        return kwargs
+
+    def form_valid(self, form):
+        tarefa = form.save(commit=False)
+        tarefa.projetoparent = self.projeto
+        tarefa.equipe = self.projeto.equipe
+        tarefa.save()
+        messages.success(self.request, "Tarefa criada com sucesso!")
+        return redirect("projetos_detail", projeto_id=self.projeto.pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["projeto"] = self.projeto
+        context["PRIORIDADE"] = PRIORIDADE
+        return context
+
+class TarefasUpdateView(LoginRequiredMixin, UpdateView):
     model = Tarefas
     form_class = TarefasForm
-    template_name = 'projeto_crm_final/tarefas_form.html'
-    success_url = reverse_lazy('')
+    template_name = "projeto_crm_final/projetos_detail.html"
+    pk_url_kwarg = "pk"
 
-class TarefasGetView(LoginRequiredMixin, DetailView):
+    def dispatch(self, request, *args, **kwargs):
+        self.tarefa = self.get_object()
+        self.projeto = self.tarefa.projetoparent
+        #permissão especial, igual o view de criar
+        if not (request.user.integrantes == self.projeto.criador or request.user.integrantes == self.tarefa.responsavel or request.user.integrantes.role == "ADMIN"):
+            messages.error(request, "Você não tem permissão para editar esta tarefa.")
+            return redirect("projetos_detail", projeto_id=self.projeto.pk)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["projetoparent"] = self.projeto
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, "Tarefa atualizada com sucesso!")
+        return redirect("projetos_detail", projeto_id=self.projeto.pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tarefa"] = self.tarefa
+        context["projeto"] = self.projeto
+        context["PRIORIDADE"] = PRIORIDADE
+        return context
+
+class TarefasDeleteView(LoginRequiredMixin, DeleteView):
     model = Tarefas
-    template_name = "projeto_crm_final/tarefas_detail.html"
-    context_object_name = "tarefa"
-    pk_url_kwarg = "tarefa_id"
+    template_name = "projeto_crm_final/tarefas_confirm_delete.html"
+    pk_url_kwarg = "pk"
 
-class TarefasDeleteView(LoginRequiredMixin,LeadRequiredMixin, ProjetoOwnerMixin, DeleteView):
-    model = Tarefas
-    template_name = 'projeto_crm_final/tarefas_confirm_del.html'
-    success_url = reverse_lazy('')
+    def dispatch(self, request, *args, **kwargs):
+        self.tarefa = self.get_object()
+        self.projeto = self.tarefa.projetoparent
+        # Permissão
+        if not (request.user.integrantes == self.projeto.criador or request.user.integrantes.role == "ADMIN"):
+            messages.error(request, "Você não tem permissão para excluir esta tarefa.")
+            return redirect("projetos_detail", pk=self.projeto.pk)
+        return super().dispatch(request, *args, **kwargs)
 
-"""
+    def get_success_url(self):
+        messages.success(self.request, "Tarefa excluída com sucesso!")
+        return reverse("projetos_detail", kwargs={"pk": self.projeto.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tarefa"] = self.tarefa
+        context["projeto"] = self.projeto
+        return context
+

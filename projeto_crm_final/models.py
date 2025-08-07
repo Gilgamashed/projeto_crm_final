@@ -101,18 +101,31 @@ class RelatorioProjeto(models.Model):
 
 
 class Tarefas(models.Model):
-    tarefa = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
     descricao = models.TextField()
-    projeto = models.ForeignKey(Projetos, on_delete=models.CASCADE)
-    equipe = models.ForeignKey(Equipes, on_delete=models.CASCADE)
-    usuario = models.ForeignKey(Integrantes, on_delete=models.SET_NULL, null=True)
-    status = models.CharField(max_length=15, choices=STATUS, default='parafazer')
+    projetoparent = models.ForeignKey(Projetos, on_delete=models.CASCADE, related_name="tarefas_do_projeto")
+    equipe = models.ForeignKey(Equipes, on_delete=models.CASCADE, verbose_name="Equipe Responsável")
+    responsavel = models.ForeignKey(Integrantes, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Responsável Direto")
+    status = models.CharField(max_length=15, choices=STATUS, default='todo')
     prazofinal = models.DateField()
-    inicio = models.DateField(auto_now_add=True)
-    prioridade = models.CharField(max_length=10, choices=PRIORIDADE)
+    inicio = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")
+    atualizado = models.DateTimeField(auto_now=True, verbose_name="Atualizado em")
+    prioridade = models.CharField(max_length=10, choices=PRIORIDADE, default='regular')
+
+    class Meta:
+        verbose_name = "Tarefa"
+        verbose_name_plural = "Tarefas"
+        ordering = ['prazofinal']
+
+
+    def save(self, *args, **kwargs):
+        if not self.equipe_id and self.projetoparent_id:
+            self.equipe = self.projetoparent.equipe
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.tarefa} - {self.status} - {self.prazofinal}"
+        return f"{self.name} | {self.get_status_display()}"
+
 
 class AuditLog(models.Model):
     usuario = models.ForeignKey(Integrantes, on_delete=models.SET_NULL, null=True)

@@ -2,8 +2,6 @@
 
 STATUS = [
     ('todo','Para fazer'),
-    ('analise','Em analise'),
-    ('debater','A debater'),
     ('emandamento','Em andamento'),
     ('done','Feito'),
     ('late','Atrasada'),
