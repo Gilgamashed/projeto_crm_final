@@ -1,5 +1,4 @@
 import csv
-import mimetypes
 
 import cloudinary
 from django.conf import settings
@@ -12,18 +11,17 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.db import models
-from django.db.models import Count, Q
-from django.http import JsonResponse, HttpResponseForbidden, request, HttpResponseRedirect, Http404, HttpResponse
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, DeleteView, UpdateView
 
-from projeto_crm_final.constants import HIERARCH, CATEGORIA, PRIORIDADE, STATUS
+from projeto_crm_final.constants import CATEGORIA, PRIORIDADE, STATUS
 from projeto_crm_final.forms import SignupForm, ProjetosForm, EquipesForm, ProfileForm, CredentialsForm, RelatorioForm, \
     TarefasForm, RelatorioTarefaForm
-from projeto_crm_final.mixins import AdminRequiredMixin, LeadRequiredMixin, ProjetoOwnerMixin
+from projeto_crm_final.mixins import LeadRequiredMixin, ProjetoOwnerMixin
 from projeto_crm_final.models import Integrantes, Projetos, Tarefas, Equipes
 
 
