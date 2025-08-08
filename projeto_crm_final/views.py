@@ -715,6 +715,8 @@ class TarefasCreateView(LoginRequiredMixin, CreateView):
         tarefa = form.save(commit=False)
         tarefa.projetoparent = self.projeto
         tarefa.equipe = self.projeto.equipe
+        if tarefa.responsavel:
+            tarefa.status = 'doing'
         tarefa.save()
         messages.success(self.request, "Tarefa criada com sucesso!")
         return redirect("projetos_detail", projeto_id=self.projeto.pk)
@@ -746,7 +748,12 @@ class TarefasUpdateView(LoginRequiredMixin, UpdateView):
         return kwargs
 
     def form_valid(self, form):
-        form.save()
+        tarefa = form.save(commit=False)
+        if tarefa.responsavel:
+            tarefa.status = 'doing'
+        else:
+            tarefa.status = 'todo'
+        tarefa.save()
         messages.success(self.request, "Tarefa atualizada com sucesso!")
         return redirect("projetos_detail", projeto_id=self.projeto.pk)
 

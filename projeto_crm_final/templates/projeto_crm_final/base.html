@@ -43,6 +43,37 @@
           cursor: not-allowed;
         }
 
+        /* Menssagens de aleerta */
+        .alert {
+          width: 98%;
+          max-width: 1240px;
+          padding: 15px 15px 13px 15px;
+          margin: 0 auto 35px auto;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          font-size: 0.95rem;
+          line-height: 1.5;
+        }
+
+        .alert-danger {
+          background-color: #f8d7da;
+          border-color: #f5c6cb;
+          color: #721c24;
+        }
+
+        .alert-success {
+          background-color: #d4edda;
+          border-color: #c3e6cb;
+          color: #155724;
+        }
+
+        .alert .btn-close {
+          padding: 0.75rem;
+          position: absolute;
+          top: 10px;
+          right: 10px;
+        }
+
     </style>
 
 </head>
@@ -102,7 +133,7 @@
                 Ferramentas Admin
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{% url 'admin_integ_list}">Lista de Integrantes</a></li>
+                <li><a class="dropdown-item" href="{% url 'admin_integ_list' %}">Lista de Integrantes</a></li>
                 <li><a class="dropdown-item" href="#">Another action</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="#">Something else here</a></li>
@@ -123,14 +154,8 @@
               {% endif %}
             </li>
             {% endif %}
-
           </ul>
-            <!-- search bar
-          <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-            <button class="btn btn-outline-success" type="submit">Search</button>
-          </form>
-            -->
+
           {% if user.is_authenticated %}
             <form action="{% url 'account_logout' %}" class="d-flex" method="post" role="search">
                 {% csrf_token %}
@@ -142,14 +167,25 @@
         </div>
       </div>
     </nav>
-        {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-{%if 'error' in message.tags %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% endfor %}
+
+            <!-- Menssagens -->
+    {% if messages %}
+      <div class="message-container">
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            <div class="d-flex align-items-center justify-content-center">
+              <i class="bi {% if 'error' in message.tags %}bi-exclamation-triangle-fill{% else %}bi-check-circle-fill{% endif %} me-2"></i>
+              <div>
+                <strong class="me-2">{% if 'error' in message.tags %}Erro:{% else %}Sucesso:{% endif %}</strong>
+                {{ message }}
+              </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
     {% endif %}
+
     <div class="container mt-4">
         {% block content %}{% endblock %}
     </div>

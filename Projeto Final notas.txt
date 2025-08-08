@@ -57,20 +57,21 @@ Logs
 lista
 
     home
-        mudar tamanho da msg de erro/succs
+    ok?    mudar tamanho da msg de erro/succs
+    duvida        Menssagens quebraram!
         projetos
-            meu projeto ativo
-            se nao tiver projeto ativo? redireciona pra lista de projetos? botao cinza?
-            lista de projetos
+    ok        meu projeto ativo
+    ok        se nao tiver projeto ativo? redireciona pra lista de projetos? botao cinza?
+    ok        lista de projetos
         Equipes
-            minha equipe
-            lista de equipes
+    ok        minha equipe
+    ok        lista de equipes
         Perfil
             link pra lista de integrantes?
         Mais algo?
 
     supabase
-        popular database
+    ok    popular database
 
     render
         boa sorte
@@ -134,6 +135,7 @@ lista
 
 	Fazer o dashboard
 	        reorganizar botoes para fazer
+	        Tarefas de outros usuarios deviam aparecer como fazendo
 	duvida  detalhes da tarefa 405!!
 	        concertar equipe ativa e projeto ativo
 

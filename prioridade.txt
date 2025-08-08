@@ -1,0 +1,4 @@
+('baixa','Baixa'),
+('regular', 'Regular'),
+('alta', 'Alta'),
+('urgente', 'Urgente')

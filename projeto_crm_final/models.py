@@ -14,7 +14,7 @@ class Integrantes(models.Model):
     sobrenome = models.CharField(max_length=100)
     telefone = models.CharField(max_length=20, blank=True)
     role = models.CharField(max_length=20,choices=HIERARCH,default='MEMBER',null=False,blank=False)
-    cargo = models.CharField(max_length=20, default='Desligado')
+    cargo = models.CharField(max_length=35, default='Desligado')
     equipe = models.ForeignKey('Equipes', on_delete=models.SET_NULL, null=True, blank=True, max_length=20)
 
     @property

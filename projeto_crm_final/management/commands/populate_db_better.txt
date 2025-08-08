@@ -1,0 +1,40 @@
+
+
+person_id: random uuid.uuid4
+nome: character's first name from names.txt list max length 25 (NOT RANDOM - NOT REPEATABLE)
+sobrenome: character's last name from names.txt list (NOT RANDOM - NOT REPEATABLE)
+user: first name+first letter of last name+random double digit number all minuscule in relation to nome in sobrenome
+telefone: 21+9+8 or 9+random 7 digits integer
+email: username+@email.com
+role: random from 'MEMBER','LEAD','ADMIN' weighted towards member, ONE LEAD FOR EACH TEAM
+cargo: random from cargos.txt list max length 20
+user_id: from 22 onwards
+
+do it until all names from the list are gone
+
+for Equipes:
+    name: from list [Malkuth, Yesod, Hod, Netzach, Tiphereth, Gebura, Chesed, Binah, Hokma, Keter]
+    leader: the 'LEAD' users
+    membros: 3 to 8 members
+
+for Projetos:
+    name: random from list projetosnames.txt
+    criador: the team leader
+    equipe: a random team or none
+    categoria: from list
+    inicio: random date from last week
+    prioridade: random from list
+    status: 'active'
+    prazofinal: random date up until a month from now
+
+for Tarefas
+    name: random from list tarefasnames.txt
+    descricao: random stuff such as "The world needs you!" or "Its dangerous to go alone!"
+    projetoparent = random Projeto
+    equipe = the same as its projetoparent's
+    responsavel = random member from its equipe or blank
+    status = random from ['todo', 'doing','done']
+    prazofinal = the same as its projetoparent's
+    inicio = the same as its projetoparent's
+    atualizado = now
+    prioridade = random from [baixa, regular, alta, urgente]
