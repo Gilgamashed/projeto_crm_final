@@ -17,10 +17,10 @@
     </div>
   {% else %}
     <div class="team-info">
-      <h2>Sua Equipe: {{ equipe.nome }}</h2>
+      <h2>Sua Equipe: <a href="{% url 'equipes_detail' active_equipe.id %}">{{ equipe.name }} </a> </h2>
 
       {% if active_projeto %}
-        <h3>Projeto Ativo: {{ active_projeto.nome }}</h3>
+        <h4>Projeto Ativo: <a href="{% url 'projetos_detail' active_projeto.id %}">{{ active_projeto.name }} </a> </h4>
       {% else %}
         <div class="alert alert-warning">
           Sua equipe não tem projetos ativos!

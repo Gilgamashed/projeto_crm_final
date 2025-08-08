@@ -34,6 +34,15 @@
         .container {
           max-width: 960px;
         }
+
+
+        /* itens desativados do navbar */
+        .disabled {
+          pointer-events: none;
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
     </style>
 
 </head>
@@ -55,11 +64,34 @@
             </li>
                             <!-- navbar Projetos -->
             {% if user.is_authenticated %}
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="{% url 'projetos_list' %} ">Projetos</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                Projetos
+              </a>
+              <ul class="dropdown-menu">
+                {% if active_projeto %}
+                  <li><a class="dropdown-item" href="{% url 'projetos_detail' active_projeto.id %}">Meu Projeto</a></li>
+                {% else %}
+                  <li><span class="dropdown-item disabled text-muted">Meu projeto</span></li>
+                {% endif %}
+                <li><a class="dropdown-item" href="{% url 'projetos_list' %}">Projetos</a></li>
+              </ul>
             </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="{% url 'equipes_list' %} ">Equipes</a>
+            {% endif %}
+                            <!-- navbar equipes -->
+            {% if user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                Equipes
+              </a>
+              <ul class="dropdown-menu">
+                {% if has_team %}
+                  <li><a class="dropdown-item" href="{% url 'equipes_detail' active_equipe.id %}">Minha Equipe</a></li>
+                {% else %}
+                  <li><span class="dropdown-item disabled text-muted">Minha Equipe</span></li>
+                {% endif %}
+                <li><a class="dropdown-item" href="{% url 'equipes_list' %}">Equipes</a></li>
+              </ul>
             </li>
             {% endif %}
 
@@ -70,7 +102,7 @@
                 Ferramentas Admin
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="/admin/lista_integrantes">Lista de Integrantes</a></li>
+                <li><a class="dropdown-item" href="{% url 'admin_integ_list}">Lista de Integrantes</a></li>
                 <li><a class="dropdown-item" href="#">Another action</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="#">Something else here</a></li>
@@ -81,29 +113,24 @@
               <!-- navbar Perfil user -->
             {% if user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="{% url 'account_user_detail' person_id=request.user.integrantes.person_id %} ">Perfil</a>
+              {% if current_user_profile %}
+                <a class="nav-link active" aria-current="page"
+                   href="{% url 'account_user_detail' person_id=current_user_profile.person_id %}">
+                  Perfil
+                </a>
+              {% else %}
+                <span class="nav-link disabled text-muted">Perfil</span>
+              {% endif %}
             </li>
             {% endif %}
 
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                Dropdown
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Action</a></li>
-                <li><a class="dropdown-item" href="#">Another action</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Something else here</a></li>
-              </ul>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-            </li>
           </ul>
+            <!-- search bar
           <form class="d-flex" role="search">
             <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
             <button class="btn btn-outline-success" type="submit">Search</button>
           </form>
+            -->
           {% if user.is_authenticated %}
             <form action="{% url 'account_logout' %}" class="d-flex" method="post" role="search">
                 {% csrf_token %}

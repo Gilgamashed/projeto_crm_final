@@ -175,7 +175,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
         return context
 
-# ------- Tarefas - Outras no fim do codigo! ----------
+# ------- Tarefas - porque deixei aqui e nao no fim?! ----------
 class TarefasAssign(View):
     def post(self, request, task_id):
         integrante = Integrantes.objects.get(user=request.user)

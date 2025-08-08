@@ -55,11 +55,36 @@ Logs
 
 
 lista
+
+    home
+        mudar tamanho da msg de erro/succs
+        projetos
+            meu projeto ativo
+            se nao tiver projeto ativo? redireciona pra lista de projetos? botao cinza?
+            lista de projetos
+        Equipes
+            minha equipe
+            lista de equipes
+        Perfil
+            link pra lista de integrantes?
+        Mais algo?
+
+    supabase
+        popular database
+
+    render
+        boa sorte
+
 	Sistema de autenticação
-	    como user vira admin/lead? convite?
+	ok?    como user vira admin/lead? convite?
 	    lista de integrantes?
-	    retirar botoes de edição de perfis alheios
+	ok    retirar botoes de edição de perfis alheios
+	    reorganiar pagina
+	    retirar id e role do perfil
+	    retirar botao de admin
+	    mudar zona perigosa pro botao de editar info da conta
 	    cobrir com testes
+	    lista de integrantes?
 
 
 	Implementar CRUD para tarefas básico
@@ -76,7 +101,6 @@ lista
 	ok                tarefas_delete
 	ok            lista de tarefas na pagina de projetos
 	ok            opção de criar nova tarefa
-	duvida            detalhes da tarefa da 405!!
 	            detalhes da tarefa com espaço pra observações?
 	ok            retirar botao de criar nova equipe se usuario já estiver em uma equipe
 	ok?            bota de sair da equipe (lider precisa desfazer grupo se quiser sair?)
@@ -109,6 +133,9 @@ lista
 	Fazer o log
 
 	Fazer o dashboard
+	        reorganizar botoes para fazer
+	duvida  detalhes da tarefa 405!!
+	        concertar equipe ativa e projeto ativo
 
 	Fazer notificações
 	

@@ -44,7 +44,7 @@ urlpatterns = [
     path('account/excluir/', delete_account, name='account_delete'),
     path('account/password_reset/', PassResetView.as_view(), name='account_reset_password'),
 
-    path('admin/lista_integrantes', IntegrantesListaView.as_view(), name='admin_integ_list'),
+    path('account/lista_integrantes', IntegrantesListaView.as_view(), name='admin_integ_list'),
 
     path('equipes/', EquipesView.as_view(), name='equipes_list'),
     path('equipes/novo/', EquipesCreateView.as_view(), name='equipes_create'),
