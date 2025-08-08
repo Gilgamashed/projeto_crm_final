@@ -649,20 +649,29 @@ class ProjetosGetView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         projeto = self.get_object()
-        context["tarefas"] = projeto.tarefas_do_projeto.all().order_by("prazofinal")
+        context["tarefas"] = None
+        context["can_create"] = False
+        context["user_is_equipe"] = False
 
-        # Verifica se o usuário pode criar/editar tarefas
-        can_create = False
         if self.request.user.is_authenticated:
             integrante = self.request.user.integrantes
-            if integrante == projeto.criador or integrante.role == "ADMIN":
-                can_create = True
-        context["can_create"] = can_create
 
-        # Adiciona o formulário de tarefas ao contexto
-        context["form_tarefa"] = TarefasForm(projetoparent=projeto)
+            # user é da equipe?
+            if projeto.equipe and integrante in projeto.equipe.membros.all():
+                context["user_is_equipe"] = True
+                context["tarefas"] = projeto.tarefas_do_projeto.all().order_by("prazofinal")
+
+                # checa se usuario pode criar tareefas
+                if integrante == projeto.criador or integrante.role == "ADMIN":
+                    context["can_create"] = True
+
+            # sempree permite admin ver tarefas mesmo se nao for da equipe
+            elif integrante == projeto.criador or integrante.role == "ADMIN":
+                context["user_is_equipe"] = True
+                context["tarefas"] = projeto.tarefas_do_projeto.all().order_by("prazofinal")
+                context["can_create"] = True
+
         context["PRIORIDADE"] = PRIORIDADE
-
         return context
 
 class ProjetosDeleteView(LoginRequiredMixin,LeadRequiredMixin, ProjetoOwnerMixin, DeleteView):

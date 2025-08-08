@@ -116,6 +116,8 @@ lista
 	ok    criar categorias para projetos
 	ok    filtros por categoria
 	duvida      alterar status do projeto em relaçao ao prazo (atrasado!)
+	      botao de concluir projeto na pagina do projeto
+	      mudar prioridade do projeto concluido para outra coisa?
 	      deletar nao deleta mas deixa arquivado e ineditavel?
 	    cobrir com testes
 
@@ -135,7 +137,8 @@ lista
 
 	Fazer o dashboard
 	        reorganizar botoes para fazer
-	        Tarefas de outros usuarios deviam aparecer como fazendo
+	ok        Tarefas de outros usuarios deviam aparecer como fazendo
+	        botao de concluir só devia aparecer para o dono do projeto
 	duvida  detalhes da tarefa 405!!
 	        concertar equipe ativa e projeto ativo
 

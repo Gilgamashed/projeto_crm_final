@@ -136,6 +136,7 @@
 </div>
 
 <!-- Card de tarefas -->
+{% if user_is_equipe %}
 <div class="container mt-5">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -238,6 +239,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 
 <!-- Modal excluir projeto -->
 <div class="modal fade" id="modalExcluir" tabindex="-1" aria-labelledby="modalExcluirLabel" aria-hidden="true">
@@ -287,7 +289,7 @@
                     <option value="">Não atribuído</option>
                     {% if projeto.equipe %}
                         {% for membro in projeto.equipe.membros.all %}
-                            <!-- Add selected attribute if current user -->
+                            <!-- prioridade pro usuario atual -->
                             <option value="{{ membro.person_id }}"
                                 {% if membro == request.user.integrantes %}selected{% endif %}>
                                 {{ membro.nome }} {{ membro.sobrenome }}
