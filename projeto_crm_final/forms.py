@@ -5,8 +5,6 @@ from django.core.exceptions import ValidationError
 
 from .models import Integrantes, Projetos, Tarefas, Equipes, RelatorioProjeto, RelatorioTarefa
 
-from .constants import PRIORIDADE, STATUS
-
 
 class SignupForm(UserCreationForm):
     nome = forms.CharField(

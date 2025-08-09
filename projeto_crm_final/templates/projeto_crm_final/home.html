@@ -11,6 +11,9 @@
         </div>
       {% endfor %}
     {% endif %}
+{% if user.is_authenticated %}
+<p>Se for sua primeira vez fazendo login, visite seu <a href="{% url 'account_user_detail' person_id=current_user_profile.person_id %}">perfil</a> e atualize seus dados.</p>
+{% endif %}
 <p> Vai Brasil!</p>
 {% endblock %}
 
