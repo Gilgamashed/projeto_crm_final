@@ -34,9 +34,9 @@ class SignupForm(UserCreationForm):
         }
     )
     telefone = forms.CharField(
-        max_length=20,
+        max_length=15,
         required=False,
-        widget=forms.NumberInput(attrs={'class': 'form-control'}),
+        widget=forms.TextInput(attrs={'placeholder':'(99)99999-9999', 'class': 'form-control'}),
         label='Telefone'
     )
 
@@ -57,14 +57,6 @@ class SignupForm(UserCreationForm):
             'username': 'Obrigatório. 20 caracteres ou menos. Letras, números e @/./+/-/_ apenas.',
             'email': 'Por favor, insira um e-mail válido.'
         }
-
-    #def save(self, commit=True):
-    #    user = super().save(commit=False)
-    #    user.nome = self.cleaned_data['nome']
-    #    user.sobrenome = self.cleaned_data['sobrenome']
-    #    if commit:
-    #        user.save()
-    #    return user
 
     def save(self, commit=True):
         user = super().save(commit=False)

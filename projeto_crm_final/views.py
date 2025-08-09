@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import logger, PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.contrib.auth.views import PasswordResetCompleteView, PasswordResetConfirmView
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.db import models
@@ -35,6 +36,11 @@ class SignUpView(CreateView):
     form_class = SignupForm
     template_name = "account/signup.html"
     success_url = reverse_lazy('dashboard')
+
+    def dispatch(self, request, *args, **kwargs):       #Para usuarios já logados
+        if request.user.is_authenticated:
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -125,9 +131,6 @@ def change_password(request):
             })
     return redirect('account_info_edit')
 
-
-class PassResetView(TemplateView):
-    template_name = "account/password_reset.html"
 
 #------------ Dashboard -----------
 class DashboardView(LoginRequiredMixin, TemplateView):

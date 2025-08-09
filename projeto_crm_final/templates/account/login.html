@@ -1,53 +1,206 @@
 {% extends 'projeto_crm_final/base.html' %}
-{% load widget_tweaks %}  <!-- pode ser colocado na pagina template base -->
+{% load widget_tweaks %}
 {% block title %}Login{% endblock %}
 
-
 {% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h1 class="display-5 mb-0"><i class="fas fa-lock me-2"></i>Acesso ao Sistema</h1>
+                </div>
 
-<div class="container mt-5">
-  <h2>Login</h2>
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-circle fa-3x text-primary mb-3"></i>
+                        <p class="lead text-muted">Faça login para acessar sua conta</p>
+                    </div>
 
-  <form method="post" action="{% url 'account_login' %}">
-    {% csrf_token %}
-    {% if form.errors %}
-      <div class="alert alert-danger">Erro: Verifique seu nome de usuário e senha.</div>
-    {% endif %}
+                    <form method="post" action="{% url 'account_login' %}">
+                        {% csrf_token %}
 
-    <div class ="mb-3">
-      <label for="username" class="form-label"></label>
-      <input type="text" name="username" id="username" class="form-control">
-    </div>
-    <div class="mb-3">
-      <label for="password" class="form-label"></label>
-      <input type="password" name="password" id="password" class="form-control">
-    </div>
+                        {% if form.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <strong>Erro:</strong> Verifique seu nome de usuário e senha.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endif %}
 
-    <div class="mb-3 form-check">
-      <input type="checkbox" class="form-check-input" id="id_remember" name="remember">
-      <label class="form-check-label" for="id_remember">Lembre-se de mim</label>
-    </div>
+                        <div class="mb-4">
+                            <label for="username" class="form-label fw-bold text-primary">Usuário</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-user text-primary"></i>
+                                </span>
+                                <input type="text" name="username" id="username"
+                                       class="form-control form-control-lg"
+                                       placeholder="Digite seu usuário" required>
+                            </div>
+                        </div>
 
-    <button type="submit" class="btn btn-primary">Login</button>
-      <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-bold text-primary">Senha</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-key text-primary"></i>
+                                </span>
+                                <input type="password" name="password" id="password"
+                                       class="form-control form-control-lg"
+                                       placeholder="Digite sua senha" required>
+                                <span class="input-group-text bg-light border-start-0" id="togglePassword">
+                                    <i class="fas fa-eye text-primary" id="eyeIcon"></i>
+                                </span>
+                            </div>
+                        </div>
 
-    <!-- Segurança -->
-    <div class="mt-3">
-      <a href="{% url 'account_reset_password' %}">Esqueceu sua senha?</a>
+                        <div class="mb-4 form-check d-flex align-items-center">
+                            <input type="checkbox" class="form-check-input me-2" id="id_remember" name="remember">
+                            <label class="form-check-label" for="id_remember">Lembre-se de mim</label>
+                        </div>
 
-        | <a href="{% url 'account_signup' %}">Registrar</a>
+                        <div class="d-grid gap-2 mb-4">
+                            <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold">
+                                <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                            </button>
+                            <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg py-3">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                        </div>
 
-    </div>
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <div class="d-flex justify-content-center gap-3">
+                                <a href="{% url 'account_reset_password' %}" class="text-decoration-none">
+                                    <i class="fas fa-key me-1"></i>Esqueceu sua senha?
+                                </a>
+                                <span class="text-muted">|</span>
+                                <a href="{% url 'account_signup' %}" class="text-decoration-none">
+                                    <i class="fas fa-user-plus me-1"></i>Registrar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
 
-    <div class="mt-3">
-      {% if form.non_field_errors %}
-        {% for error in form.non_field_errors %}
-            <div class="my-3 alert alert-danger">
-                {{ error }}
+                <div class="card-footer bg-light py-3 text-center">
+                    <p class="text-muted small mb-0">
+                        Precisa de ajuda? Envie um e-mail para
+                        <a href="mailto:projeto.minstrel@gmail.com" class="text-decoration-none">projeto.minstrel@gmail.com</a>
+                    </p>
+                    <p class="text-muted small mt-1">Versão 1.0 - © {% now "Y" %} Caius I O</p>
+                </div>
             </div>
-        {% endfor %}
-      {% endif %}
+        </div>
     </div>
-  </form>
 </div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-header {
+        border-radius: 0 !important;
+    }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-right: none;
+    }
+
+    .form-control {
+        border-left: none;
+        padding: 1rem;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        border-color: #86b7fe;
+    }
+
+    .btn-lg {
+        border-radius: 10px;
+        letter-spacing: 0.5px;
+        font-size: 1.1rem;
+    }
+
+    .btn-outline-secondary {
+        transition: all 0.3s;
+    }
+
+    .btn-outline-secondary:hover {
+        background: linear-gradient(135deg, #6c757d, #5c636a);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+        margin-top: 0;
+    }
+
+    #togglePassword {
+        cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 2rem;
+        }
+
+        .col-lg-6 {
+            max-width: 95%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        h1.display-5 {
+            font-size: 1.75rem;
+        }
+
+        .fa-3x {
+            font-size: 2.5em;
+        }
+
+        .d-flex.justify-content-center.gap-3 {
+            flex-direction: column;
+            gap: 0.5rem !important;
+        }
+
+        .d-flex.justify-content-center.gap-3 span {
+            display: none;
+        }
+    }
+</style>
+
+<script>
+    // Password visibility toggle
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordField = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            eyeIcon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            eyeIcon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    });
+</script>
 {% endblock %}

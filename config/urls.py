@@ -17,16 +17,19 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.contrib.auth.views import LoginView, LogoutView
-from django.urls import path
+from django.contrib.auth.views import (LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, \
+PasswordResetConfirmView, PasswordResetCompleteView)
+from django.urls import path, reverse_lazy
 from django.views.decorators.http import require_POST
 
-from projeto_crm_final.views import SignUpView, HomeView, PassResetView, DashboardView, IntegrantesGetView, \
+from projeto_crm_final.views import SignUpView, HomeView, DashboardView, IntegrantesGetView, \
     UpdateRoleView, IntegrantesListaView, ProjetosCreateView, ProjetosUpdateView, ProjetosView, ProjetosGetView, \
     ProjetosDeleteView, EquipesView, EquipesCreateView, EquipesUpdateView, EquipesGetView, EquipesDeleteView, \
     assign_project, remove_project, edit_profile, delete_account, edit_account_info, change_password, equipes_invite, \
     TarefasCreateView, TarefasUpdateView, TarefasDeleteView, TarefasDetailView, TarefasAssign, TarefasReportView, \
     EquipesLeaveView, TarefasExportCSSView
+
+PasswordResetCompleteView.success_url = reverse_lazy('account_login')
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -34,6 +37,7 @@ urlpatterns = [
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
 
     path('account/login/', LoginView.as_view(template_name='account/login.html'), name='account_login'),
+    path('account/login/', LoginView.as_view(template_name='account/login.html'), name='login'),
     path('account/logout/', require_POST(LogoutView.as_view(next_page='home')), name='account_logout'),
     path("account/profile/<uuid:person_id>/", IntegrantesGetView.as_view(), name='account_user_detail'),
     path('account/profile/edit', edit_profile, name='account_profile_edit'),
@@ -42,7 +46,26 @@ urlpatterns = [
     path('update_role/', UpdateRoleView.as_view(), name='update_role'),
     path('account/signup/', SignUpView.as_view(), name='account_signup'),
     path('account/excluir/', delete_account, name='account_delete'),
-    path('account/password_reset/', PassResetView.as_view(), name='account_reset_password'),
+
+
+    path('account/password_reset/',
+         PasswordResetView.as_view(template_name='account/password_reset.html',
+                                   email_template_name='account/password_reset_email.html',
+                                   subject_template_name='account/password_reset_subject.txt'),
+                                   name='account_reset_password'),
+    path('account/password_reset/done/',
+         PasswordResetDoneView.as_view(template_name='account/password_reset_done.html'),
+                                       name='password_reset_done'),
+    path('account/password_reset/<uidb64>/<token>/',
+         PasswordResetConfirmView.as_view(
+                                   template_name='account/password_reset_confirm.html'),
+                                   name='password_reset_confirm'),
+    path('account/password_reset/complete/',
+        PasswordResetCompleteView.as_view(
+                                   template_name='account/password_reset_complete.html',
+                                   success_url=reverse_lazy('account_login')),
+                                   name='password_reset_complete'),
+
 
     path('account/lista_integrantes', IntegrantesListaView.as_view(), name='admin_integ_list'),
 

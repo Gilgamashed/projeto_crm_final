@@ -142,6 +142,17 @@ lista
 	duvida  detalhes da tarefa 405!!
 	        concertar equipe ativa e projeto ativo
 
+ok	Apresentação de sistema na home
+ok	esqueceu a senha?
+ok	msg de erro caso telefone nao seja só numero
+	sistema de solicitação
+ok	mudar default do cargo
+	atualizar conta redirecionar pro login
+	botar action no card
+	informação para quem não tem equipe
+	botao pra se inscrever no projeto na pagina do projeto
+	botão torto no perfil de equipe
+
 	Fazer notificações
 	
 	Reports e analytics

@@ -16,6 +16,30 @@
       Não pertence a nenhuma equipe! <a href="{% url 'equipes_list' %}">Encontre ou Crie uma!</a>
     </div>
   {% else %}
+
+      <!-- Boas vindas pra usuarios novos -->
+    {% if integrante.cargo == "Não definido" or not integrante.cargo %}
+    <div class="card mb-4 border-primary">
+      <div class="card-header bg-primary text-white">
+        <h4>Bem-vindo ao sistema!</h4>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">Primeiros Passos:</h5>
+        <ol>
+          <li>Complete seu <a href="{% url 'account_user_detail' person_id=integrante.person_id %}" class="text-primary">perfil</a> (especialmente seu cargo)</li>
+          <li>Conheça sua <a href="{% url 'equipes_detail' active_equipe.id %}" class="text-primary">equipe</a></li>
+          <li>Explore os <a href="{% url 'projetos_list' %}" class="text-primary">projetos ativos</a></li>
+          <li>Atribua-se a tarefas no quadro Kanban abaixo</li>
+        </ol>
+        {% if integrante.cargo == "Não definido" %}
+        <div class="alert alert-warning mt-3">
+          <strong>Atenção:</strong> Seu cargo ainda não foi definido. Por favor, atualize seu perfil.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
     <div class="team-info">
       <h2>Sua Equipe: <a href="{% url 'equipes_detail' active_equipe.id %}">{{ equipe.name }} </a> </h2>
 
