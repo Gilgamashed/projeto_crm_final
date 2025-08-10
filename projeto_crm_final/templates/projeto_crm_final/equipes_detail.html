@@ -5,6 +5,31 @@
 
 {% block content %}
 <style>
+
+    /* botoes da sidebar */
+    .sidebar-actions .btn {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        min-height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* espaçamento */
+    .sidebar-actions .btn-lg {
+        width: 100%;
+        margin-bottom: 0.75rem;
+    }
+
+    /* alinhamento  */
+    .sidebar-actions .btn i {
+        margin-right: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+
+
     .team-header {
         background: linear-gradient(135deg, #2c3e50, #4a6491);
         color: white;
@@ -89,7 +114,7 @@
         background: #3498db;
         border-radius: 3px;
     }
-    /* Add consistent spacing */
+    /* espaçamento */
     .card {
         margin-bottom: 1.5rem;
         border-radius: 0.75rem;
@@ -100,7 +125,7 @@
         border-radius: 0.75rem 0.75rem 0 0 !important;
     }
 
-    /* Better file input styling */
+    /* input do file */
     .input-group .btn-outline-secondary {
         border-color: #ced4da;
     }
@@ -109,16 +134,18 @@
         background-color: #e9ecef;
     }
 
-    /* Better spacing for form elements */
+    /* espaçamento do form */
     .form-label {
         font-weight: 500;
         margin-bottom: 0.5rem;
     }
 
-    /* Consistent margins */
+    /* margem */
     .mb-4, .mb-3, .mb-2 {
         margin-bottom: 1rem !important;
     }
+
+
 </style>
 
 <main class="container py-4">
@@ -266,30 +293,32 @@
 
 
         
-        <!-- botoes laterais direito -->
-        <div class="col-lg-4">
-            <div class="d-grid gap-2 mb-4">
-                <!-- sair da equipe -->
-                {% if request.user.integrantes.equipe.id == equipe.id %}
-                  <form method="post" action="{% url 'equipes_leave' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger btn-lg">
-                      <i class="bi bi-box-arrow-right"></i> Sair da Equipe
-                    </button>
-                  </form>
-                {% endif %}
-                <!-- delete and edit -->
-                {% if user == equipe.leader.user or user.integrantes.role == 'ADMIN' %}
-                <a href="{% url 'equipes_edit' equipe.id %}" class="btn btn-warning btn-lg">
-                    <i class="bi bi-pencil-square me-2"></i> Editar Equipe
-                </a>
-
-                <!-- Modal de confirmação -->
-                <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                    <i class="bi bi-trash me-2"></i> Excluir Equipe
+    <!-- botoes laterais direito -->
+    <div class="col-lg-4">
+        <div class="sidebar-actions d-grid gap-2 mb-4">
+            <!-- sair da equipe -->
+            {% if request.user.integrantes.equipe.id == equipe.id %}
+            <form method="post" action="{% url 'equipes_leave' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-lg">
+                    <i class="bi bi-box-arrow-right"></i> Sair da Equipe
                 </button>
-            </div>
+            </form>
             {% endif %}
+
+            <!-- delete and edit -->
+            {% if user == equipe.leader.user or user.integrantes.role == 'ADMIN' %}
+            <a href="{% url 'equipes_edit' equipe.id %}" class="btn btn-warning btn-lg">
+                <i class="bi bi-pencil-square"></i> Editar Equipe
+            </a>
+
+            <!-- Modal de confirmação -->
+            <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                <i class="bi bi-trash"></i> Excluir Equipe
+            </button>
+            {% endif %}
+        </div>
+
             <!-- cool stats? -->
             <h2 class="section-title">Estatísticas da Equipe</h2>
             <div class="card mb-4">
@@ -352,71 +381,76 @@
         </div>
     </div>
     
-    <!-- Membros -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="section-title">Membros da Equipe</h2>
-                <div>
-                    <span class="badge bg-primary p-2">Total: {{ equipe.membros.count }} membros</span>
-                </div>
-            </div>
-            
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                {% for member in equipe.membros.all %}
-                <div class="col">
-                    <div class="card member-card h-100">
-                        <div class="card-body">
-                            {% if member == equipe.leader %}
-                            <span class="badge bg-primary leader-badge">Líder</span>
-                            {% endif %}
-                            
-                            <div class="d-flex align-items-center mb-4">
-                                <div class="flex-shrink-0">
-                                    <div class="bg-light border rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                                        <i class="bi bi-person fs-1 text-secondary"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h5 class="card-title mb-0">{{ member.nome }} {{ member.sobrenome }}</h5>
-                                    <p class="card-text text-muted mb-1">{{ member.cargo }}</p>
-                                    <div class="member-role">
-                                        <i class="bi bi-person-badge me-1"></i>
-                                        <span class="text-uppercase">{{ member.role }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="border-top pt-3">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-envelope me-2 text-primary"></i>
-                                            <small>{{ member.user.email }}</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-telephone me-2 text-success"></i>
-                                            <small>{{ member.telefone|default:"N/A" }}</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-transparent border-top-0">
-                            <a href="{% url 'account_user_detail' member.person_id %}" class="btn btn-outline-primary w-100">
-                                <i class="bi bi-person-lines-fill me-2"></i>Ver Perfil
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
+<!-- Membros -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title">Membros da Equipe</h2>
+            <div>
+                <span class="badge bg-primary p-2">Total: {{ equipe.membros.count }} membros</span>
             </div>
         </div>
-    </div>
-</main>
 
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for member in equipe.membros.all %}
+            <div class="col">
+                <div class="card member-card h-100">
+                    <div class="card-body">
+                        {% if member == equipe.leader %}
+                        <span class="badge bg-primary leader-badge">Líder</span>
+                        {% endif %}
+
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="flex-shrink-0">
+                                <div class="bg-light border rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                    <i class="bi bi-person fs-1 text-secondary"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-0">{{ member.nome }} {{ member.sobrenome }}</h5>
+                                <p class="card-text text-muted mb-1">{{ member.cargo }}</p>
+                                <div class="member-role">
+                                    <i class="bi bi-person-badge me-1"></i>
+                                    <span class="text-uppercase">{{ member.role }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-top pt-3">
+                            <div class="row">
+                                <!-- Email e likn -->
+                                <div class="col-12 mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-envelope me-2 text-primary"></i>
+                                        <a href="mailto:{{ member.user.email }}" class="text-truncate" style="max-width: 80%">
+                                            {{ member.user.email }}
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Phone -->
+                                <div class="col-12">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-telephone me-2 text-success"></i>
+                                        <span class="text-truncate" style="max-width: 80%">
+                                            {{ member.telefone|default:"N/A" }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a href="{% url 'account_user_detail' member.person_id %}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-person-lines-fill me-2"></i>Ver Perfil
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 
 <!-- modal de confirmar exclusao da equipe -->
 {% if user == equipe.leader.user or user.integrantes.role == 'ADMIN' %}

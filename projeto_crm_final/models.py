@@ -135,7 +135,7 @@ class RelatorioTarefa(models.Model):
     data_envio = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Relatório para {self.tarefa.titulo} - {self.data_envio}"
+        return f"Relatório para {self.tarefa.name} - {self.data_envio}"
 
 
 class AuditLog(models.Model):
