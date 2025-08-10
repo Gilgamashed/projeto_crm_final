@@ -146,9 +146,10 @@ ok	Apresentação de sistema na home
 ok	esqueceu a senha?
 ok	msg de erro caso telefone nao seja só numero
 	sistema de solicitação
+	solicitar ingresso na lista de lideres
 ok	mudar default do cargo
-	atualizar conta redirecionar pro login
-	botar action no card
+ok	atualizar conta redirecionar pro login
+ok	botar action no card
 	informação para quem não tem equipe
 	botao pra se inscrever no projeto na pagina do projeto
 	botão torto no perfil de equipe

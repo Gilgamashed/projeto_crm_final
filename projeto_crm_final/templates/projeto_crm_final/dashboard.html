@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="header">
-  <h1>Bem vindo(a), {{ integrante.nome }} {{ integrante.sobrenome }}</h1>
+  <h1>Bem vindo(a), {{ integrante.nome }} {{ integrante.sobrenome }}!</h1>
 
   {% if no_profile %}
     <div class="alert alert-danger">
@@ -13,7 +13,7 @@
     </div>
   {% elif no_team %}
     <div class="alert alert-info">
-      Não pertence a nenhuma equipe! <a href="{% url 'equipes_list' %}">Encontre ou Crie uma!</a>
+      Não pertence a nenhuma equipe! <a href="{% url 'equipes_list' %}">Encontre ou Crie</a> uma para poder começar a trabalhar no sistema!
     </div>
   {% else %}
 
@@ -33,7 +33,7 @@
         </ol>
         {% if integrante.cargo == "Não definido" %}
         <div class="alert alert-warning mt-3">
-          <strong>Atenção:</strong> Seu cargo ainda não foi definido. Por favor, atualize seu perfil.
+          <strong>Atenção:</strong> Seu cargo ainda não foi definido. Por favor, atualize seu <a href="{% url 'account_user_detail' person_id=integrante.person_id">perfil</a>.
         </div>
         {% endif %}
       </div>

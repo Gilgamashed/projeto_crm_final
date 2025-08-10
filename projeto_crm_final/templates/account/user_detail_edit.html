@@ -24,12 +24,12 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Editar Perfil</h3>
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h2 class="display-5 mb-0"><i class="fas fa-user-edit me-2"></i>Editar Perfil</h2>
                 </div>
                 
-                <div class="card-body">
+                <div class="card-body p-4 p-md-5">
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
                         
@@ -82,8 +82,13 @@
                             <label for="{{ form.telefone.id_for_label }}" class="form-label fw-bold">
                                 Telefone
                             </label>
-                            {% render_field form.telefone class="form-control" %}
-                            {% if form.telefone.errors %}
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-phone text-primary"></i>
+                                    </span>
+                                    {% render_field form.telefone class="form-control form-control-lg phone-input" %}
+                                </div>
+                                {% if form.telefone.errors %}
                                 <div class="invalid-feedback d-block">
                                     {% for error in form.telefone.errors %}
                                         {{ error }}
@@ -125,5 +130,60 @@
     </div>
 </div>
 
+
+<script>
+// Phone number formatting and validation
+document.addEventListener('DOMContentLoaded', function() {
+    const phoneInput = document.querySelector('.phone-input');
+
+    if (phoneInput) {
+        // Format phone number as user types
+        phoneInput.addEventListener('input', function(e) {
+            // Get cursor position
+            const cursorPosition = this.selectionStart;
+
+            // Remove all non-digit characters
+            let phoneNumber = this.value.replace(/\D/g, '');
+
+            // Format phone number (Brazilian format)
+            let formattedNumber = '';
+            if (phoneNumber.length > 0) {
+                formattedNumber = '(' + phoneNumber.substring(0, 2);
+            }
+            if (phoneNumber.length > 2) {
+                formattedNumber += ') ' + phoneNumber.substring(2, 7);
+            }
+            if (phoneNumber.length > 7) {
+                formattedNumber += '-' + phoneNumber.substring(7, 11);
+            }
+
+            // Update value
+            this.value = formattedNumber;
+
+            // Restore cursor position
+            if (cursorPosition === 1 && phoneNumber.length < 2) {
+                this.setSelectionRange(2, 2);
+            } else if (cursorPosition === 3 && phoneNumber.length < 3) {
+                this.setSelectionRange(4, 4);
+            } else if (cursorPosition === 9 && phoneNumber.length < 8) {
+                this.setSelectionRange(10, 10);
+            } else if (cursorPosition === 14 && phoneNumber.length < 12) {
+                this.setSelectionRange(15, 15);
+            } else {
+                this.setSelectionRange(cursorPosition, cursorPosition);
+            }
+        });
+
+        // Clean phone number before form submission
+        const form = document.getElementById('profileForm');
+        form.addEventListener('submit', function(e) {
+            if (phoneInput) {
+                // Remove all non-digit characters before submitting
+                phoneInput.value = phoneInput.value.replace(/\D/g, '');
+            }
+        });
+    }
+});
+</script>
 
 {% endblock %}

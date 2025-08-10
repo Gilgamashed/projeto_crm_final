@@ -51,6 +51,7 @@ class SignUpView(CreateView):
 @login_required
 def edit_profile(request):
     # Editar profile de usuário
+    user = request.user
     profile = request.user.integrantes
 
     if request.method == 'POST':
@@ -58,7 +59,8 @@ def edit_profile(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Perfil atualizado com sucesso!")
-            return redirect('home')
+            userprofile = Integrantes.objects.get(user=user)
+            return redirect('account_user_detail', person_id=userprofile.person_id)
     else:
         form = ProfileForm(instance=profile)
 
@@ -103,7 +105,8 @@ def edit_account_info(request):
             #Salva
             form.save()
             messages.success(request, "Informações da conta atualizadas com sucesso!")
-            return redirect('home')
+            profile = Integrantes.objects.get(user=user)
+            return redirect('account_user_detail', person_id=profile.person_id)
     else:
         form = CredentialsForm(instance=user)
 
