@@ -380,8 +380,8 @@
             </div>
         </div>
     </div>
-    
-<!-- Membros -->
+
+    <!-- Card de Membros -->
 <div class="row mt-4">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -418,7 +418,7 @@
 
                         <div class="border-top pt-3">
                             <div class="row">
-                                <!-- Email e likn -->
+                                <!-- Email -->
                                 <div class="col-12 mb-2">
                                     <div class="d-flex align-items-center">
                                         <i class="bi bi-envelope me-2 text-primary"></i>
@@ -440,10 +440,30 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer bg-transparent border-top-0">
-                        <a href="{% url 'account_user_detail' member.person_id %}" class="btn btn-outline-primary w-100">
-                            <i class="bi bi-person-lines-fill me-2"></i>Ver Perfil
-                        </a>
+
+                    <div class="card-footer bg-transparent border-top-0 pt-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'account_user_detail' member.person_id %}"
+                               class="btn btn-outline-primary flex-grow-1 me-2">
+                                <i class="bi bi-person-lines-fill me-2"></i>Perfil
+                            </a>
+
+                            <!-- Botão de remover usuario -->
+                            {% if user.integrantes.role == 'ADMIN' or user == equipe.leader.user %}
+                                {% if member != equipe.leader and member != user.integrantes %}
+                                <form method="post"
+                                      action="{% url 'equipes_remove_member' equipe.id member.person_id %}"
+                                      class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm"
+                                            title="Remover membro da equipe">
+                                        <i class="bi bi-person-x"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>

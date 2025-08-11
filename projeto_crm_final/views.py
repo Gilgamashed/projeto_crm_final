@@ -12,7 +12,7 @@ from django.contrib.auth.views import PasswordResetCompleteView, PasswordResetCo
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.db import models
-from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
@@ -459,6 +459,26 @@ class EquipesGetView(LoginRequiredMixin, DetailView):
         context = self.get_context_data()
         context['form'] = form
         return render(request, self.template_name, context)
+
+def equipes_remove_member(request, equipe_id, member_id):
+    equipe = get_object_or_404(Equipes, pk=equipe_id)
+    member = get_object_or_404(Integrantes, person_id=member_id)
+
+    # Verifica permissão
+    if not (request.user == equipe.leader.user or
+            request.user.integrantes.role == 'ADMIN'):
+        return HttpResponseForbidden("Sem permissão para esta ação")
+
+    # Lideres não podem ser removidos
+    if member == equipe.leader:
+        return HttpResponseBadRequest("Não é possível remover o líder da equipe")
+
+    # kick member
+    equipe.remove_member(member)
+
+    messages.success(request, f"{member.nome} removido da equipe com sucesso!")
+    return redirect('equipes_detail', equipe_id=equipe_id)
+
 
 @login_required
 def assign_project(request, equipe_id):

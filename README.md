@@ -77,7 +77,7 @@ Sistema web desenvolvido com Django para **gestão de projetos, tarefas e colabo
 - **Membros** podem:
   - Atualizar status de tarefas
   - Enviar relatórios de progresso
-- Restrição de 1 projeto ativo por equipe
+- Restrições automáticas impedem múltiplos projetos ativos na mesma equipe.
 - Sem restrição de tarefas pro projeto
 
 ---
@@ -97,20 +97,26 @@ Sistema web desenvolvido com Django para **gestão de projetos, tarefas e colabo
 ## ⚙️ Configuração (.env)
 
 ```env
-DEBUG=True
-SECRET_KEY=sua-chave-secreta
-ALLOWED_HOSTS=*.onrender.com,localhost
-
-# Cloudinary
-CLOUDINARY_URL=cloudinary://api_key:api_secret@cloud_name
-
-# Banco de dados
 DB_ENGINE=django.db.backends.postgresql
 DB_NAME=postgres
-DB_USER=usuario
-DB_PASSWORD=senha
-DB_HOST=localhost
+DB_USER=<usuario>
+DB_PASSWORD=<senha>
+DB_HOST=<host>
 DB_PORT=5432
+
+EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=<email>
+EMAIL_HOST_PASSWORD=<senha>
+EMAIL_USE_TLS=True
+
+CLOUDINARY_URL=cloudinary://679115125914332:N8P9-h2PE1Z7GQtlLgicwpTX4Ag@dubztifnq
+DEFAULT_FILE_STORAGE=cloudinary_storage.MediaCloudinaryStorage
+
+DEBUG=True
+ALLOWED_HOSTS=*.onrender.com,localhost,127.0.0.1
+SECRET_KEY=<chave secreta>
 ```
 
 ---
@@ -150,10 +156,11 @@ python manage.py runserver
 
 ---
 ## 🎯 Melhorias Futuras
-* Sistema de notificações integrado
+* Histórico de alterações e ações via **Audit Log**.
+* Sistema de notificações em tempo real
 * Sistema de autenticação por convite usando tokens únicos
 * Calendário de prazos e marcos
-* Dashboard interativo
+* Dashboard Kanban interativo
 * Métricas de produtividade por equipe/membro
 
 ## 🧪 Testes e Cobertura

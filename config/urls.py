@@ -27,7 +27,7 @@ from projeto_crm_final.views import SignUpView, HomeView, DashboardView, Integra
     ProjetosDeleteView, EquipesView, EquipesCreateView, EquipesUpdateView, EquipesGetView, EquipesDeleteView, \
     assign_project, remove_project, edit_profile, delete_account, edit_account_info, change_password, equipes_invite, \
     TarefasCreateView, TarefasUpdateView, TarefasDeleteView, TarefasDetailView, TarefasAssign, TarefasReportView, \
-    EquipesLeaveView, TarefasExportCSSView
+    EquipesLeaveView, TarefasExportCSSView, equipes_remove_member
 
 PasswordResetCompleteView.success_url = reverse_lazy('account_login')
 
@@ -77,6 +77,8 @@ urlpatterns = [
     path("equipes/<int:equipe_id>", EquipesGetView.as_view(), name='equipes_detail'),
     path('equipes/<int:equipe_id>/projetos/', assign_project, name='equipes_projetos'),
     path('equipes/<int:equipe_id>/remove_projeto/', remove_project, name='remove_projeto'),
+    path('equipes/<int:equipe_id>/remove-member/<uuid:member_id>/', equipes_remove_member,
+                                                                    name='equipes_remove_member'),
     path('equipes/<int:pk>/excluir/', EquipesDeleteView.as_view(), name='equipes_delete'),
 
     path('projetos/', ProjetosView.as_view() , name='projetos_list'),
