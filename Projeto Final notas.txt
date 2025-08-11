@@ -152,7 +152,7 @@ ok	atualizar conta redirecionar pro login
 ok	botar action no card
 ok?	informação para quem não tem equipe
 	botao pra se inscrever no projeto na pagina do projeto
-	botão torto no perfil de equipe
+ok	botão torto no perfil de equipe
 
 	Fazer notificações
 	
